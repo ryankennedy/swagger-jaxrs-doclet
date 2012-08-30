@@ -73,12 +73,15 @@ public class ServiceDoclet {
                     apiMap.put(apiPath, methodMap);
                 }
             }
-            
-            for(String apiPath: apiMap.keySet()){
+            List<String> apiList = new ArrayList<String>(apiMap.keySet());
+            Collections.sort(apiList);
+            for(String apiPath: apiList){
                 List<Api> apiBuilder = new LinkedList<Api>();
 
             	Map<String,List<Method>> methodMap = apiMap.get(apiPath);
-            	for(String path:methodMap.keySet()){
+            	List<String> keyList = new ArrayList<String>(methodMap.keySet());
+            	Collections.sort(keyList);
+            	for(String path:keyList){
             		List<Operation> methodBuilder = new LinkedList<Operation>();
             		
             		for(Method me:methodMap.get(path)){
