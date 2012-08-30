@@ -32,6 +32,6 @@ public class ApiParameter {
     }
 
     public boolean getRequired() {
-        return true;
+        return (paramType.equals("query")?false:true);
     }
 }

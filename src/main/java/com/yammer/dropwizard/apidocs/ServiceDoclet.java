@@ -12,8 +12,13 @@ public class ServiceDoclet {
     public static final String JAX_RS_PATH = "javax.ws.rs.Path";
     public static final String JAX_RS_PATH_PARAM = "javax.ws.rs.PathParam";
     public static final String JAX_RS_QUERY_PARAM = "javax.ws.rs.QueryParam";
+    
+    private static String docBasePath = "http://localhost:8080";
+    private static String apiBasePath = "http://localhost:8080";
+    private static String apiVersion = "0";
 
-    public static final List<String> METHODS = new ArrayList<String>() {{
+    @SuppressWarnings("serial")
+	public static final List<String> METHODS = new ArrayList<String>() {{
         add("javax.ws.rs.GET");
         add("javax.ws.rs.PUT");
         add("javax.ws.rs.POST");
@@ -28,6 +33,15 @@ public class ServiceDoclet {
      */
     public static boolean start(RootDoc doc) {
         JavaDocParameters parameters = JavaDocParameters.parse(doc.options());
+        
+        if(parameters.getDocBasePath()!=null)
+        	docBasePath=parameters.getDocBasePath();
+        if(parameters.getApiBasePath()!=null)
+        	apiBasePath=parameters.getApiBasePath();
+        if(parameters.getApiVersion()!=null)
+        	apiVersion=parameters.getApiVersion();
+        
+        Map<String, Map<String,List<Method>>> apiMap = new HashMap<String, Map<String,List<Method>>>();
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, true);
@@ -35,34 +49,53 @@ public class ServiceDoclet {
         try {
             List<ResourceListingAPI> builder = new LinkedList<ResourceListingAPI>();
 
-            String basePath = "http://localhost:8080";
-            String apiVersion = "API_VERSION_HERE";
-
             for (ClassDoc classDoc : doc.classes()) {
-                List<Api> apiBuilder = new LinkedList<Api>();
-                String apiPath = path(classDoc);
+                String apiPath = path(classDoc.annotations());
                 if (apiPath != null) {
-                    List<Operation> methodBuilder = new LinkedList<Operation>();
+                	
+                	Map<String,List<Method>> methodMap = apiMap.get(apiPath);
+                	if(methodMap==null){
+                		methodMap = new HashMap<String,List<Method>>();
+                	}
 
                     for (MethodDoc method : classDoc.methods()) {
                         Method me = parseMethod(method);
                         if (me != null) {
-                            methodBuilder.add(new Operation(me.getMethod(), me.getMethodName(), "Greeting",
-                                                            me.getParameters(), me.getComment()));
+                        	List<Method> methods = methodMap.get(me.getPath());
+                        	if (methods==null){
+                        		methods = new ArrayList<Method>();
+                        	}
+                        	methods.add(me);
+                        	methodMap.put(me.getPath(), methods);
+                            
                         }
                     }
-
-                    apiBuilder.add(new Api(apiPath, classDoc.getRawCommentText(), methodBuilder));
-                    builder.add(new ResourceListingAPI("/apidocs/descriptors/" + classDoc.name() + ".{format}",
-                                                       classDoc.getRawCommentText()));
-
-                    File classFile = new File(parameters.getOutput(), classDoc.name() + ".json");
-                    ApiDeclaration declaration = new ApiDeclaration(apiVersion, basePath, apiBuilder);
-                    mapper.writeValue(classFile, declaration);
+                    apiMap.put(apiPath, methodMap);
                 }
             }
+            
+            for(String apiPath: apiMap.keySet()){
+                List<Api> apiBuilder = new LinkedList<Api>();
 
-            ResourceListing listing = new ResourceListing(apiVersion, basePath, builder);
+            	Map<String,List<Method>> methodMap = apiMap.get(apiPath);
+            	for(String path:methodMap.keySet()){
+            		List<Operation> methodBuilder = new LinkedList<Operation>();
+            		
+            		for(Method me:methodMap.get(path)){
+            			methodBuilder.add(new Operation(me.getMethod(), me.getMethodName(), "Greeting",
+            					me.getParameters(), me.getComment()));
+            		}
+            		apiBuilder.add(new Api(apiPath+path, "", methodBuilder));
+            	}
+            	
+                builder.add(new ResourceListingAPI("/" + apiPath.replace("/", "") + ".{format}",""));
+
+                File apiFile = new File(parameters.getOutput(), apiPath.replace("/", "") + ".json");
+                ApiDeclaration declaration = new ApiDeclaration(apiVersion, apiBasePath, apiBuilder);
+                mapper.writeValue(apiFile, declaration);
+            }
+
+            ResourceListing listing = new ResourceListing(apiVersion, docBasePath, builder);
             File docFile = new File(parameters.getOutput(), "service.json");
             mapper.writeValue(docFile, listing);
 
@@ -72,8 +105,8 @@ public class ServiceDoclet {
         }
     }
 
-    private static String path(ClassDoc doc) {
-        for (AnnotationDesc annotationDesc : doc.annotations()) {
+    private static String path(AnnotationDesc[] annotations) {
+        for (AnnotationDesc annotationDesc : annotations) {
             if (annotationDesc.annotationType().qualifiedTypeName().equals(JAX_RS_PATH)) {
                 for (AnnotationDesc.ElementValuePair pair : annotationDesc.elementValues()) {
                     if (pair.element().name().equals("value")) {
@@ -89,6 +122,10 @@ public class ServiceDoclet {
     private static Method parseMethod(MethodDoc method) {
         for (AnnotationDesc desc : method.annotations()) {
             if (METHODS.contains(desc.annotationType().qualifiedTypeName())) {
+            	
+            	String path = path(method.annotations());
+            	if (path==null) path = "";
+            	
                 List<ApiParameter> parameterBuilder = new LinkedList<ApiParameter>();
 
                 for (Parameter parameter : method.parameters()) {
@@ -99,6 +136,7 @@ public class ServiceDoclet {
 
                 return new Method(desc.annotationType().name(),
                                   method.name(),
+                                  path,
                                   parameterBuilder,
                                   method.commentText(),
                                   method.returnType().qualifiedTypeName());
@@ -156,6 +194,9 @@ public class ServiceDoclet {
     public static int optionLength(String option) {
         Map<String, Integer> options = new HashMap<String, Integer>();
         options.put("-d", 2);
+        options.put("-docBasePath", 2);
+        options.put("-apiBasePath", 2);
+        options.put("-apiVersion", 2);
 
         Integer value = options.get(option);
         if (value != null) {

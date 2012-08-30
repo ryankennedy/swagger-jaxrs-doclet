@@ -8,12 +8,14 @@ public class Method {
     private List<ApiParameter> apiParameters;
     private String comment;
     private String returnType;
+    private String path;
 
     private Method() { }
 
-    public Method(String method, String methodName, List<ApiParameter> apiParameters, String comment, String returnType) {
+    public Method(String method, String methodName, String path, List<ApiParameter> apiParameters, String comment, String returnType) {
         this.method = method;
         this.methodName = methodName;
+        this.path = path;
         this.apiParameters = apiParameters;
         this.comment = comment;
         this.returnType = returnType;
@@ -27,6 +29,10 @@ public class Method {
         return methodName;
     }
 
+    public String getPath() {
+    	return path;
+    }
+    
     public List<ApiParameter> getParameters() {
         return apiParameters;
     }
