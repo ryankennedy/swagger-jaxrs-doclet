@@ -176,7 +176,13 @@ public class ServiceDoclet {
 			return "Date";
 		} else {
 			// TODO: have to make sure we add this type to the models section
-			return javaType;
+			int i = javaType.lastIndexOf(".");
+			if(i>=0){
+				return javaType.substring(i);
+			} else {
+				return javaType;	
+			}
+			
 		}
 	}
 
