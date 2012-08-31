@@ -178,7 +178,7 @@ public class ServiceDoclet {
 			// TODO: have to make sure we add this type to the models section
 			int i = javaType.lastIndexOf(".");
 			if(i>=0){
-				return javaType.substring(i);
+				return javaType.substring(i+1);
 			} else {
 				return javaType;	
 			}
