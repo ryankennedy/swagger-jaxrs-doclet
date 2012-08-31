@@ -11,7 +11,8 @@ public class Method {
     private String returnType;
     private String path;
 
-    private Method() { }
+    @SuppressWarnings("unused")
+	private Method() { }
 
     public Method(String method, String methodName, String path, List<ApiParameter> apiParameters, String firstSentence, String comment, String returnType) {
         this.method = method;

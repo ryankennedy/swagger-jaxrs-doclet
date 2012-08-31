@@ -6,7 +6,8 @@ public class ApiParameter {
     private String description;
     private String dataType;
 
-    private ApiParameter() { }
+    @SuppressWarnings("unused")
+	private ApiParameter() { }
 
     public ApiParameter(String paramType, String name, String description, String dataType) {
         this.paramType = paramType;

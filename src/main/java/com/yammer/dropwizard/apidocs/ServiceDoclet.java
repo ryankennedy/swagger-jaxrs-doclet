@@ -85,7 +85,7 @@ public class ServiceDoclet {
 					List<Operation> methodBuilder = new LinkedList<Operation>();
 
 					for(Method me:methodMap.get(path)){
-						methodBuilder.add(new Operation(me.getMethod(), me.getMethodName(), "Greeting",
+						methodBuilder.add(new Operation(me.getMethod(), me.getMethodName(), typeOf(me.getReturnType()),
 								me.getParameters(), me.getFirstSentence(), me.getComment()));
 					}
 					apiBuilder.add(new Api(apiPath+path, "", methodBuilder));
@@ -172,8 +172,10 @@ public class ServiceDoclet {
 	private static String typeOf(String javaType) {
 		if (javaType.equals("String") || javaType.equals("java.lang.String")) {
 			return "string";
+		} else if(javaType.equals("java.util.Date")) {
+			return "Date";
 		} else {
-			// todo: have to make sure we add this type to the models section
+			// TODO: have to make sure we add this type to the models section
 			return javaType;
 		}
 	}

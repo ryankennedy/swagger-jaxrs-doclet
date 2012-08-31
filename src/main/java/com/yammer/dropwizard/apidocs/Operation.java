@@ -10,7 +10,8 @@ public class Operation {
     private String summary; // cap at 60 characters for readability in the UI
     private String notes;
 
-    private Operation() { }
+    @SuppressWarnings("unused")
+	private Operation() { }
 
     public Operation(String httpMethod, String nickname, String responseClass, List<ApiParameter> parameters, String summary, String notes) {
         this.httpMethod = httpMethod;

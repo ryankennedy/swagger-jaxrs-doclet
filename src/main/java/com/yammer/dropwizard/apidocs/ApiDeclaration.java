@@ -7,7 +7,8 @@ public class ApiDeclaration {
     private String basePath;
     private List<Api> apis;
 
-    private ApiDeclaration() { }
+    @SuppressWarnings("unused")
+	private ApiDeclaration() { }
 
     public ApiDeclaration(String apiVersion, String basePath, List<Api> apis) {
         this.apiVersion = apiVersion;

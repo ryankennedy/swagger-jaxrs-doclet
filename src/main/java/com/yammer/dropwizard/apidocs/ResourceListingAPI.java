@@ -4,7 +4,8 @@ public class ResourceListingAPI {
     private String path;
     private String description;
 
-    private ResourceListingAPI() { }
+    @SuppressWarnings("unused")
+	private ResourceListingAPI() { }
 
     public ResourceListingAPI(String path, String description) {
         this.path = path;

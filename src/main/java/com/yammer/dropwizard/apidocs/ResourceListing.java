@@ -7,7 +7,8 @@ public class ResourceListing {
     private String basePath;
     private List<ResourceListingAPI> apis;
 
-    private ResourceListing() { }
+    @SuppressWarnings("unused")
+	private ResourceListing() { }
 
     public ResourceListing(String apiVersion, String basePath, List<ResourceListingAPI> apis) {
         this.apiVersion = apiVersion;
