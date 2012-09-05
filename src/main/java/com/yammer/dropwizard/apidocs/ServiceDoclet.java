@@ -53,7 +53,7 @@ public class ServiceDoclet {
                     }
 
                     apiBuilder.add(new Api(apiPath, classDoc.getRawCommentText(), methodBuilder));
-                    builder.add(new ResourceListingAPI("/apidocs/descriptors/" + classDoc.name() + ".{format}",
+                    builder.add(new ResourceListingAPI("/apidocs/" + classDoc.name() + ".{format}",
                                                        classDoc.getRawCommentText()));
 
                     File classFile = new File(parameters.getOutput(), classDoc.name() + ".json");
