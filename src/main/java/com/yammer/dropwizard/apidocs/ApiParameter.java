@@ -1,12 +1,16 @@
 package com.yammer.dropwizard.apidocs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ApiParameter {
     private String paramType;
     private String name;
     private String description;
     private String dataType;
 
-    private ApiParameter() { }
+    @SuppressWarnings("unused")
+	private ApiParameter() { }
 
     public ApiParameter(String paramType, String name, String description, String dataType) {
         this.paramType = paramType;
@@ -32,6 +36,18 @@ public class ApiParameter {
     }
 
     public boolean getRequired() {
-        return true;
+        return (paramType.equals("query")?false:true);
+    }
+    
+    public AllowableValues getAllowableValues() {
+    	if(dataType.equals("boolean")){
+    		List<String> values = new ArrayList<String>();
+    		values.add("false");
+    		values.add("true");
+    		return new AllowableValues(values);
+    	} else {
+    		return null;
+    	}
+    	
     }
 }
