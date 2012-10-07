@@ -1,6 +1,7 @@
 package com.yammer.dropwizard.apidocs;
 
 import com.sun.javadoc.*;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 
@@ -12,6 +13,7 @@ public class ServiceDoclet {
 	public static final String JAX_RS_PATH = "javax.ws.rs.Path";
 	public static final String JAX_RS_PATH_PARAM = "javax.ws.rs.PathParam";
 	public static final String JAX_RS_QUERY_PARAM = "javax.ws.rs.QueryParam";
+	private static final String DROPWIZARD_AUTH_PARAM = "com.yammer.dropwizard.auth.Auth";
 
 	private static String docBasePath = "http://localhost:8080";
 	private static String apiBasePath = "http://localhost:8080";
@@ -24,6 +26,7 @@ public class ServiceDoclet {
 		add("javax.ws.rs.POST");
 		add("javax.ws.rs.DELETE");
 	}};
+
 
 	/**
 	 * Generate documentation here.
@@ -91,9 +94,10 @@ public class ServiceDoclet {
 					apiBuilder.add(new Api(apiPath+path, "", methodBuilder));
 				}
 
-				builder.add(new ResourceListingAPI("/" + apiPath.replace("/", "") + ".{format}",""));
+				String rootPath = apiPath.startsWith("/") ? apiPath.split("/")[1] : apiPath.split("/")[0];
+				builder.add(new ResourceListingAPI("/" + rootPath + ".{format}",""));
 
-				File apiFile = new File(parameters.getOutput(), apiPath.replace("/", "") + ".json");
+				File apiFile = new File(parameters.getOutput(), rootPath + ".json");
 				ApiDeclaration declaration = new ApiDeclaration(apiVersion, apiBasePath, apiBuilder);
 				mapper.writeValue(apiFile, declaration);
 			}
@@ -132,9 +136,12 @@ public class ServiceDoclet {
 				List<ApiParameter> parameterBuilder = new LinkedList<ApiParameter>();
 
 				for (Parameter parameter : method.parameters()) {
-					String parameterComment = commentForParameter(method, parameter);
-					parameterBuilder.add(new ApiParameter(paramTypeOf(parameter), parameter.name(), parameterComment,
-							typeOf(parameter.typeName())));
+					if (!excludeParameter(parameter)) {
+						String parameterComment = commentForParameter(method, parameter);
+						parameterBuilder.add(new ApiParameter(paramTypeOf(parameter), parameter.name(),
+								parameterComment,
+								typeOf(parameter.typeName())));
+					}
 				}
 				
 				Tag[] fst = method.firstSentenceTags();
@@ -154,6 +161,19 @@ public class ServiceDoclet {
 		}
 
 		return null;
+	}
+
+	private static boolean excludeParameter(Parameter parameter) {
+		AnnotationDesc[] annotations = parameter.annotations();
+		for (AnnotationDesc annotation : annotations) {
+			String annotationTypeName = annotation.annotationType().qualifiedTypeName();
+			if (annotationTypeName.equals(DROPWIZARD_AUTH_PARAM)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return false;
 	}
 
 	private static String paramTypeOf(Parameter parameter) {
