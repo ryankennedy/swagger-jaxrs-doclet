@@ -13,7 +13,7 @@ public class ServiceDoclet {
 	public static final String JAX_RS_PATH = "javax.ws.rs.Path";
 	public static final String JAX_RS_PATH_PARAM = "javax.ws.rs.PathParam";
 	public static final String JAX_RS_QUERY_PARAM = "javax.ws.rs.QueryParam";
-	private static final String DROPWIZARD_AUTH_PARAM = "com.yammer.dropwizard.auth.Auth";
+	private static final String[] EXCLUDE_PARAMS_ANNOTATED_WITH = new String[] {"com.yammer.dropwizard.auth.Auth", "com.izettle.air.auth.AuthPasscode" };
 
 	private static String docBasePath = "http://localhost:8080";
 	private static String apiBasePath = "http://localhost:8080";
@@ -94,7 +94,7 @@ public class ServiceDoclet {
 					apiBuilder.add(new Api(apiPath+path, "", methodBuilder));
 				}
 
-				String rootPath = apiPath.startsWith("/") ? apiPath.split("/")[1] : apiPath.split("/")[0];
+				String rootPath = (apiPath.startsWith("/") ? apiPath.replaceFirst("/", "") : apiPath).replace("/", "_");
 				builder.add(new ResourceListingAPI("/" + rootPath + ".{format}",""));
 
 				File apiFile = new File(parameters.getOutput(), rootPath + ".json");
@@ -117,7 +117,8 @@ public class ServiceDoclet {
 			if (annotationDesc.annotationType().qualifiedTypeName().equals(JAX_RS_PATH)) {
 				for (AnnotationDesc.ElementValuePair pair : annotationDesc.elementValues()) {
 					if (pair.element().name().equals("value")) {
-						return pair.value().value().toString();
+						String path = pair.value().value().toString();
+						return path.startsWith("/") ? path : "/" + path;
 					}
 				}
 			}
@@ -131,6 +132,7 @@ public class ServiceDoclet {
 			if (METHODS.contains(desc.annotationType().qualifiedTypeName())) {
 
 				String path = path(method.annotations());
+				System.out.println(path);
 				if (path==null) path = "";
 
 				List<ApiParameter> parameterBuilder = new LinkedList<ApiParameter>();
@@ -165,9 +167,11 @@ public class ServiceDoclet {
 
 	private static boolean excludeParameter(Parameter parameter) {
 		AnnotationDesc[] annotations = parameter.annotations();
+		List<String> excludedAnnotations = Arrays.asList(EXCLUDE_PARAMS_ANNOTATED_WITH);
 		for (AnnotationDesc annotation : annotations) {
 			String annotationTypeName = annotation.annotationType().qualifiedTypeName();
-			if (annotationTypeName.equals(DROPWIZARD_AUTH_PARAM)) {
+			
+			if (excludedAnnotations.contains(annotationTypeName)) {
 				return true;
 			} else {
 				return false;
