@@ -1,6 +1,8 @@
 package com.yammer.dropwizard.apidocs;
 
 import com.sun.javadoc.*;
+import com.sun.javadoc.AnnotationDesc.ElementValuePair;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 
@@ -12,6 +14,7 @@ public class ServiceDoclet {
 	public static final String JAX_RS_PATH = "javax.ws.rs.Path";
 	public static final String JAX_RS_PATH_PARAM = "javax.ws.rs.PathParam";
 	public static final String JAX_RS_QUERY_PARAM = "javax.ws.rs.QueryParam";
+	private static final String[] EXCLUDE_PARAMS_ANNOTATED_WITH = new String[] {"com.yammer.dropwizard.auth.Auth", "com.izettle.air.auth.AuthPasscode" };
 
 	private static String docBasePath = "http://localhost:8080";
 	private static String apiBasePath = "http://localhost:8080";
@@ -24,6 +27,7 @@ public class ServiceDoclet {
 		add("javax.ws.rs.POST");
 		add("javax.ws.rs.DELETE");
 	}};
+
 
 	/**
 	 * Generate documentation here.
@@ -91,10 +95,13 @@ public class ServiceDoclet {
 					apiBuilder.add(new Api(apiPath+path, "", methodBuilder));
 				}
 
-				builder.add(new ResourceListingAPI("/" + apiPath.replace("/", "") + ".{format}",""));
+				String rootPath = (apiPath.startsWith("/") ? apiPath.replaceFirst("/", "") : apiPath).replaceAll("/", "_").replaceAll("(\\{|\\})", "");
+				builder.add(new ResourceListingAPI("/" + rootPath + ".{format}",""));
 
-				File apiFile = new File(parameters.getOutput(), apiPath.replace("/", "") + ".json");
+				File apiFile = new File(parameters.getOutput(), rootPath + ".json");
 				ApiDeclaration declaration = new ApiDeclaration(apiVersion, apiBasePath, apiBuilder);
+				
+//				apiFile.getParentFile().mkdirs();
 				mapper.writeValue(apiFile, declaration);
 			}
 
@@ -113,7 +120,8 @@ public class ServiceDoclet {
 			if (annotationDesc.annotationType().qualifiedTypeName().equals(JAX_RS_PATH)) {
 				for (AnnotationDesc.ElementValuePair pair : annotationDesc.elementValues()) {
 					if (pair.element().name().equals("value")) {
-						return pair.value().value().toString();
+						String path = pair.value().value().toString();
+						return path.startsWith("/") ? path : "/" + path;
 					}
 				}
 			}
@@ -127,14 +135,18 @@ public class ServiceDoclet {
 			if (METHODS.contains(desc.annotationType().qualifiedTypeName())) {
 
 				String path = path(method.annotations());
+//				System.out.println(path);
 				if (path==null) path = "";
 
 				List<ApiParameter> parameterBuilder = new LinkedList<ApiParameter>();
 
 				for (Parameter parameter : method.parameters()) {
-					String parameterComment = commentForParameter(method, parameter);
-					parameterBuilder.add(new ApiParameter(paramTypeOf(parameter), parameter.name(), parameterComment,
-							typeOf(parameter.typeName())));
+					if (!excludeParameter(parameter)) {
+						String parameterComment = commentForParameter(method, parameter);
+						parameterBuilder.add(new ApiParameter(paramTypeOf(parameter), paramNameOf(parameter),
+								parameterComment,
+								typeOf(parameter.typeName())));
+					}
 				}
 				
 				Tag[] fst = method.firstSentenceTags();
@@ -156,6 +168,21 @@ public class ServiceDoclet {
 		return null;
 	}
 
+	private static boolean excludeParameter(Parameter parameter) {
+		AnnotationDesc[] annotations = parameter.annotations();
+		List<String> excludedAnnotations = Arrays.asList(EXCLUDE_PARAMS_ANNOTATED_WITH);
+		for (AnnotationDesc annotation : annotations) {
+			String annotationTypeName = annotation.annotationType().qualifiedTypeName();
+			
+			if (excludedAnnotations.contains(annotationTypeName)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
 	private static String paramTypeOf(Parameter parameter) {
 		AnnotationDesc[] annotations = parameter.annotations();
 		for (AnnotationDesc annotation : annotations) {
@@ -167,6 +194,25 @@ public class ServiceDoclet {
 			}
 		}
 		return "body";
+	}
+	
+	private static String paramNameOf(Parameter parameter) {
+		AnnotationDesc[] annotations = parameter.annotations();
+		for (AnnotationDesc annotation : annotations) {
+			String annotationTypeName = annotation.annotationType().qualifiedTypeName();
+			if (annotationTypeName.equals(JAX_RS_PATH_PARAM)||annotationTypeName.equals(JAX_RS_QUERY_PARAM)) {
+				ElementValuePair[] evpArr = annotation.elementValues();
+				if(evpArr.length>0){
+					for(ElementValuePair evp:evpArr){
+						if (evp.element().name().equals("value")) {
+							return evp.value().value().toString();
+						}
+					}
+				}
+				return "path";
+			}
+		}
+		return parameter.name();
 	}
 
 	private static String typeOf(String javaType) {
