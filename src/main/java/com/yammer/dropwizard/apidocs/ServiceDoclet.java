@@ -188,6 +188,9 @@ public class ServiceDoclet {
 				for (AnnotationDesc.ElementValuePair pair : annotationDesc.elementValues()) {
 					if (pair.element().name().equals("value")) {
 						String path = pair.value().value().toString();
+						if(path.endsWith("/")){
+							path = path.substring(0,path.length()-1);
+						}
 						return path.startsWith("/") ? path : "/" + path;
 					}
 				}
@@ -253,7 +256,6 @@ public class ServiceDoclet {
 		if(cd!=null){
 			Model model = modelMap.get(name);
 			if(model == null){
-				System.out.println(name + " was not found, adding");
 				FieldDoc[] fdArr = cd.fields();
 				if(fdArr!=null && fdArr.length>0){
 					Map<String,Property> fieldMap = new HashMap<String, Property>();
