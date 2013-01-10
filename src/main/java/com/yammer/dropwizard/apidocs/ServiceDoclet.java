@@ -107,6 +107,14 @@ public class ServiceDoclet {
 							methods.add(me);
 							methodMap.put(me.getPath(), methods);
 
+							//build model for body parameter
+							for (Parameter parameter : method.parameters()) {
+								if (shouldIncludeParameter(parameter)) {
+									if(paramTypeOf(parameter).equalsIgnoreCase("body") && !PRIMITIVES.contains(typeOf(parameter.type())))
+										classModelMap = parseModels(parameter.type(), classModelMap);
+								}
+							}
+							
 							//build model for return type
 							Type type = method.returnType();
 							if(!type.simpleTypeName().equalsIgnoreCase("void")){
@@ -245,6 +253,7 @@ public class ServiceDoclet {
 		if(cd!=null){
 			Model model = modelMap.get(name);
 			if(model == null){
+				System.out.println(name + " was not found, adding");
 				FieldDoc[] fdArr = cd.fields();
 				if(fdArr!=null && fdArr.length>0){
 					Map<String,Property> fieldMap = new HashMap<String, Property>();
@@ -321,12 +330,12 @@ public class ServiceDoclet {
 	}
 
 	/**
-	 * Determines the string representation of the class name.
+	 * Determines the XmlRootElement name. Returns null if no name found.
 	 * 
 	 * @param classDoc
 	 * @return
 	 */
-	private static String classNameOf(ClassDoc classDoc) {
+	private static String getRootElementNameOf(ClassDoc classDoc) {
 		AnnotationDesc[] annotations = classDoc.annotations();
 		for (AnnotationDesc annotation : annotations) {
 			String annotationTypeName = annotation.annotationType().qualifiedTypeName();
@@ -341,7 +350,7 @@ public class ServiceDoclet {
 				}
 			}
 		}
-		return typeOf(classDoc.name());
+		return null;
 	}
 
 	/**
@@ -401,7 +410,10 @@ public class ServiceDoclet {
 		String name = null;
 		ClassDoc cd = type.asClassDoc();
 		if(cd!=null){
-			name = classNameOf(cd);
+			name = getRootElementNameOf(cd);
+			if(name==null){
+				name = typeOf(type.qualifiedTypeName());
+			}
 		} else {
 			name = typeOf(type.qualifiedTypeName());
 		}
