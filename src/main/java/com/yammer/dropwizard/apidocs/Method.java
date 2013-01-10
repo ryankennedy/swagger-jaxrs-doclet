@@ -51,4 +51,8 @@ public class Method {
     public String getReturnType() {
         return returnType;
     }
+    
+    public void setReturnType(String returnType){
+    	this.returnType = returnType;
+    }
 }
