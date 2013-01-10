@@ -87,8 +87,6 @@ public class ServiceDoclet {
 				//go through each class
 				String apiPath = path(classDoc.annotations());
 				if (apiPath != null) {
-					System.out.println(" ");
-					System.out.println("path:"+apiPath);
 					Map<String,List<Method>> methodMap = apiMap.get(apiPath);
 					if(methodMap==null){
 						methodMap = new HashMap<String,List<Method>>();
@@ -209,7 +207,6 @@ public class ServiceDoclet {
 
 				for (Parameter parameter : method.parameters()) {
 					if (shouldIncludeParameter(parameter)) {
-						System.out.println("param:"+paramNameOf(parameter));
 						String parameterComment = commentForParameter(method, parameter);
 						parameterBuilder.add(new ApiParameter(paramTypeOf(parameter), paramNameOf(parameter),
 								parameterComment,
@@ -261,7 +258,6 @@ public class ServiceDoclet {
 							if(typeArgs!=null && typeArgs.length>0){
 								containerOf = typeOf(typeArgs[0]);
 								if(!PRIMITIVES.contains(containerOf)){
-									System.out.println(containerOf);
 									parseModels(typeArgs[0],modelMap);
 								}
 							}
