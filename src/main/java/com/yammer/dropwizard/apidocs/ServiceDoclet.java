@@ -32,10 +32,20 @@ public class ServiceDoclet {
 	public static final String JAX_RS_PATH_PARAM = "javax.ws.rs.PathParam";
 	public static final String JAX_RS_QUERY_PARAM = "javax.ws.rs.QueryParam";
 	public static final String XML_ROOT_ELEMENT = "javax.xml.bind.annotation.XmlRootElement";
+	@SuppressWarnings("serial")
+	private static final List<String> JAX_RS_EXCLUDE_ANNOTATION_CLASSES = new ArrayList<String>() {{
+		add("javax.ws.rs.HeaderParam");
+		add("javax.ws.rs.core.Context");
+	}};
 
 	private static String docBasePath = "http://localhost:8080";
 	private static String apiBasePath = "http://localhost:8080";
 	private static String apiVersion = "0";
+	/**
+	 * If a method parameter is annotated with one of these classes, exclude
+	 * from swagger documentation
+	 */
+	private static List<String> excludeAnnotationClasses = new ArrayList<String>(JAX_RS_EXCLUDE_ANNOTATION_CLASSES);
 
 	@SuppressWarnings("serial")
 	public static final List<String> METHODS = new ArrayList<String>() {{
@@ -73,6 +83,8 @@ public class ServiceDoclet {
 			apiBasePath=parameters.getApiBasePath();
 		if(parameters.getApiVersion()!=null)
 			apiVersion=parameters.getApiVersion();
+		if(parameters.getExcludeAnnotationClasses()!=null)
+			excludeAnnotationClasses.addAll(parameters.getExcludeAnnotationClasses());
 
 		Map<String, Map<String,List<Method>>> apiMap = new HashMap<String, Map<String,List<Method>>>();
 		Map<String, Map<String,Model>> modelMap = new HashMap<String, Map<String,Model>>();
@@ -93,7 +105,7 @@ public class ServiceDoclet {
 					}
 					Map<String,Model> classModelMap = modelMap.get(apiPath);
 					if(classModelMap==null){
-						classModelMap = new HashMap<String,Model>(); 
+						classModelMap = new HashMap<String,Model>();
 					}
 
 					//add all jax-rs annotated methods to the methodmap
@@ -114,7 +126,7 @@ public class ServiceDoclet {
 										classModelMap = parseModels(parameter.type(), classModelMap);
 								}
 							}
-							
+
 							//build model for return type
 							Type type = method.returnType();
 							if(!type.simpleTypeName().equalsIgnoreCase("void")){
@@ -178,7 +190,7 @@ public class ServiceDoclet {
 
 	/**
 	 * Gets the string representation of the jax-rs path from an array of annotations.
-	 * 
+	 *
 	 * @param annotations
 	 * @return
 	 */
@@ -201,7 +213,7 @@ public class ServiceDoclet {
 
 	/**
 	 * Turns a MethodDoc(Javadoc) into a swagger serialize-able method object.
-	 * 
+	 *
 	 * @param method
 	 * @return
 	 */
@@ -246,7 +258,7 @@ public class ServiceDoclet {
 
 	/**
 	 * Recursively adds models to the model map for a type
-	 * 
+	 *
 	 * @param modelMap
 	 * @return
 	 */
@@ -257,7 +269,7 @@ public class ServiceDoclet {
 			Model model = modelMap.get(typeName);
 			if(model == null){
 				Map<String, Type> eleMap = new HashMap<String, Type>();
-				
+
 				//Get fields
 				FieldDoc[] fdArr = cd.fields();
 				if(fdArr!=null && fdArr.length>0){
@@ -267,28 +279,28 @@ public class ServiceDoclet {
 						}
 					}
 				}
-				
+
 				//Get methods
 				MethodDoc[] mdArr = cd.methods();
 				if(mdArr!=null && mdArr.length>0){
 					for(MethodDoc md:mdArr){
 						if(md.name().startsWith("get") && md.name().length()>3){
 							String name = md.name().substring(3);
-							name = name.substring(0,1).toLowerCase() + (name.length()>1?name.substring(1):""); 
+							name = name.substring(0,1).toLowerCase() + (name.length()>1?name.substring(1):"");
 							if(eleMap.get(name)==null){
 								eleMap.put(name, md.returnType());
 							}
 						}
 					}
 				}
-				
+
 				//Process all fields & methods
 				if(eleMap.keySet().size()>0){
 					Map<String,Property> fieldMap = new HashMap<String, Property>();
 					for(String eleName: eleMap.keySet()){
-						
+
 						Type eleType = eleMap.get(eleName);
-						
+
 						//Check if it is a collection and get collection type
 						String containerOf = null;
 						ParameterizedType pt = eleType.asParameterizedType();
@@ -301,12 +313,12 @@ public class ServiceDoclet {
 								}
 							}
 						}
-						
+
 						//Add to map
 						String eleTypeName = typeOf(eleType);
 						fieldMap.put(eleName, new Property(eleTypeName,null,containerOf));
 
-						//If not primitive, build the model for it too 
+						//If not primitive, build the model for it too
 						if(!PRIMITIVES.contains(eleTypeName)){
 							parseModels(eleType,modelMap);
 						}
@@ -320,29 +332,31 @@ public class ServiceDoclet {
 
 	/**
 	 * Determines if a parameter should be included, based upon annotation package.
-	 * 
+	 *
 	 * @param parameter
 	 * @return
 	 */
 	private static boolean shouldIncludeParameter(Parameter parameter) {
 		AnnotationDesc[] annotations = parameter.annotations();
-		
+
 		//Include if it has no annotations
 		if(annotations==null || annotations.length==0)
 			return true;
-		
+
 		//Include if it has a jax-rs annotation
 		for (AnnotationDesc annotation : annotations) {
 			String annotationClass = annotation.annotationType().qualifiedTypeName();
-			if(annotationClass.startsWith(JAX_RS_ANNOTATION_PACKAGE));
-			return true;
+			if(annotationClass.startsWith(JAX_RS_ANNOTATION_PACKAGE)
+					&& !excludeAnnotationClasses.contains(annotationClass)) {
+				return true;
+			}
 		}
 		return false;
 	}
 
 	/**
 	 * Determines the string representation of the parameter type.
-	 * 
+	 *
 	 * @param parameter
 	 * @return
 	 */
@@ -361,7 +375,7 @@ public class ServiceDoclet {
 
 	/**
 	 * Determines the XmlRootElement name. Returns null if no name found.
-	 * 
+	 *
 	 * @param classDoc
 	 * @return
 	 */
@@ -385,7 +399,7 @@ public class ServiceDoclet {
 
 	/**
 	 * Determines the string representation of the parameter name.
-	 * 
+	 *
 	 * @param parameter
 	 * @return
 	 */
@@ -409,7 +423,7 @@ public class ServiceDoclet {
 
 	/**
 	 * Determines the String representation of the object Type.
-	 * 
+	 *
 	 * @param javaType
 	 * @return
 	 */
@@ -427,7 +441,7 @@ public class ServiceDoclet {
 			if(i>=0){
 				type = javaType.substring(i+1);
 			} else {
-				type = javaType;	
+				type = javaType;
 			}
 		}
 		if(type.equalsIgnoreCase("integer")){
@@ -454,7 +468,7 @@ public class ServiceDoclet {
 
 	/**
 	 * Gets the string representation of the parameter comment from the Javadoc.
-	 * 
+	 *
 	 * @param method
 	 * @param parameter
 	 * @return
@@ -487,6 +501,7 @@ public class ServiceDoclet {
 		options.put("-docBasePath", 2);
 		options.put("-apiBasePath", 2);
 		options.put("-apiVersion", 2);
+		options.put("-excludeAnnotationClasses", 2);
 
 		Integer value = options.get(option);
 		if (value != null) {
