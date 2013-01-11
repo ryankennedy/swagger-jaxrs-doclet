@@ -48,6 +48,5 @@ public class ApiParameter {
     	} else {
     		return null;
     	}
-    	
     }
 }
