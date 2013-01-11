@@ -251,19 +251,47 @@ public class ServiceDoclet {
 	 * @return
 	 */
 	private static Map<String,Model> parseModels(Type type, Map<String,Model> modelMap){
-		String name = typeOf(type);
+		String typeName = typeOf(type);
 		ClassDoc cd = type.asClassDoc();
 		if(cd!=null){
-			Model model = modelMap.get(name);
+			Model model = modelMap.get(typeName);
 			if(model == null){
+				Map<String, Type> eleMap = new HashMap<String, Type>();
+				
+				//Get fields
 				FieldDoc[] fdArr = cd.fields();
 				if(fdArr!=null && fdArr.length>0){
-					Map<String,Property> fieldMap = new HashMap<String, Property>();
 					for(FieldDoc fd: fdArr){
-
-						//Check if the field is a collection and get collection type
+						if(eleMap.get(fd.name())==null){
+							eleMap.put(fd.name(), fd.type());
+						}
+					}
+				}
+				
+				//Get methods
+				MethodDoc[] mdArr = cd.methods();
+				if(mdArr!=null && mdArr.length>0){
+					for(MethodDoc md:mdArr){
+						if(md.name().startsWith("get") && md.name().length()>3){
+							String name = md.name().substring(3);
+							name = name.substring(0,1).toLowerCase() + (name.length()>1?name.substring(1):""); 
+							if(eleMap.get(name)==null){
+								eleMap.put(name, md.returnType());
+							}
+						}
+					}
+				}
+				
+				//Process all fields & methods
+				if(eleMap.keySet().size()>0){
+					Map<String,Property> fieldMap = new HashMap<String, Property>();
+					for(String eleName: eleMap.keySet()){
+						
+						Type eleType = eleMap.get(eleName);
+						
+						//Check if it is a collection and get collection type
 						String containerOf = null;
-						ParameterizedType pt = fd.type().asParameterizedType();
+						ParameterizedType pt = eleType.asParameterizedType();
 						if(pt!=null){
 							Type[] typeArgs = pt.typeArguments();
 							if(typeArgs!=null && typeArgs.length>0){
@@ -274,16 +302,16 @@ public class ServiceDoclet {
 							}
 						}
 						
-						//Add field to map
-						String typeName = typeOf(fd.type());
-						fieldMap.put(fd.name(), new Property(typeName,null,containerOf));
+						//Add to map
+						String eleTypeName = typeOf(eleType);
+						fieldMap.put(eleName, new Property(eleTypeName,null,containerOf));
 
-						//If field is not primitive, build the model for it too 
-						if(!PRIMITIVES.contains(typeName)){
-							parseModels(fd.type(),modelMap);
+						//If not primitive, build the model for it too 
+						if(!PRIMITIVES.contains(eleTypeName)){
+							parseModels(eleType,modelMap);
 						}
 					}
-					modelMap.put(name, new Model(name,fieldMap));
+					modelMap.put(typeName, new Model(typeName,fieldMap));
 				}
 			}
 		}
@@ -404,6 +432,8 @@ public class ServiceDoclet {
 		}
 		if(type.equalsIgnoreCase("integer")){
 			type = "int";
+		} else if(type.equalsIgnoreCase("arraylist") || type.equalsIgnoreCase("linkedlist")){
+			type = "List";
 		}
 		return type;
 	}
