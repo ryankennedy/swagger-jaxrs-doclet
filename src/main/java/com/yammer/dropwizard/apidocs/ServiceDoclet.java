@@ -25,6 +25,7 @@ import com.sun.javadoc.ParameterizedType;
 import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Tag;
 import com.sun.javadoc.Type;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 public class ServiceDoclet {
 	public static final String JAX_RS_ANNOTATION_PACKAGE = "javax.ws.rs";
@@ -43,18 +44,6 @@ public class ServiceDoclet {
 		add("javax.ws.rs.PUT");
 		add("javax.ws.rs.POST");
 		add("javax.ws.rs.DELETE");
-	}};
-
-	@SuppressWarnings("serial")
-	public static final List<String> PRIMITIVES = new ArrayList<String>() {{
-		add("byte");
-		add("boolean");
-		add("int");
-		add("long");
-		add("float");
-		add("double");
-		add("string");
-		add("Date");
 	}};
 
 
@@ -79,6 +68,7 @@ public class ServiceDoclet {
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, true);
+        mapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
 
 		try {
 			List<ResourceListingAPI> builder = new LinkedList<ResourceListingAPI>();
@@ -110,21 +100,20 @@ public class ServiceDoclet {
 							//build model for body parameter
 							for (Parameter parameter : method.parameters()) {
 								if (shouldIncludeParameter(parameter)) {
-									if(paramTypeOf(parameter).equalsIgnoreCase("body") && !PRIMITIVES.contains(typeOf(parameter.type())))
+									if ("body".equalsIgnoreCase(paramTypeOf(parameter))) {
 										classModelMap = parseModels(parameter.type(), classModelMap);
+                                    }
 								}
 							}
 							
 							//build model for return type
 							Type type = method.returnType();
-							if(!type.simpleTypeName().equalsIgnoreCase("void")){
+							if(!"void".equalsIgnoreCase(type.simpleTypeName())) {
 								String name = typeOf(type);
 								if (me.getReturnType()==null || !me.getReturnType().equals(name)){
 									me.setReturnType(name);
 								}
-								if(!PRIMITIVES.contains(name)){
-									classModelMap = parseModels(type, classModelMap);
-								}
+								classModelMap = parseModels(type, classModelMap);
 							}
 
 						}
@@ -244,77 +233,83 @@ public class ServiceDoclet {
 		return null;
 	}
 
+    private static boolean isModelRequired(Type type) {
+        return !type.isPrimitive() &&
+                !type.qualifiedTypeName().startsWith("java.") &&
+                !type.qualifiedTypeName().startsWith("javax.");
+    }
+
 	/**
 	 * Recursively adds models to the model map for a type
-	 * 
+	 *
 	 * @param modelMap
 	 * @return
 	 */
-	private static Map<String,Model> parseModels(Type type, Map<String,Model> modelMap){
-		String typeName = typeOf(type);
-		ClassDoc cd = type.asClassDoc();
-		if(cd!=null){
-			Model model = modelMap.get(typeName);
-			if(model == null){
-				Map<String, Type> eleMap = new HashMap<String, Type>();
-				
-				//Get fields
-				FieldDoc[] fdArr = cd.fields();
-				if(fdArr!=null && fdArr.length>0){
-					for(FieldDoc fd: fdArr){
-						if(eleMap.get(fd.name())==null){
-							eleMap.put(fd.name(), fd.type());
-						}
-					}
-				}
-				
-				//Get methods
-				MethodDoc[] mdArr = cd.methods();
-				if(mdArr!=null && mdArr.length>0){
-					for(MethodDoc md:mdArr){
-						if(md.name().startsWith("get") && md.name().length()>3){
-							String name = md.name().substring(3);
-							name = name.substring(0,1).toLowerCase() + (name.length()>1?name.substring(1):""); 
-							if(eleMap.get(name)==null){
-								eleMap.put(name, md.returnType());
-							}
-						}
-					}
-				}
-				
-				//Process all fields & methods
-				if(eleMap.keySet().size()>0){
-					Map<String,Property> fieldMap = new HashMap<String, Property>();
-					for(String eleName: eleMap.keySet()){
-						
-						Type eleType = eleMap.get(eleName);
-						
-						//Check if it is a collection and get collection type
-						String containerOf = null;
-						ParameterizedType pt = eleType.asParameterizedType();
-						if(pt!=null){
-							Type[] typeArgs = pt.typeArguments();
-							if(typeArgs!=null && typeArgs.length>0){
-								containerOf = typeOf(typeArgs[0]);
-								if(!PRIMITIVES.contains(containerOf)){
-									parseModels(typeArgs[0],modelMap);
-								}
-							}
-						}
-						
-						//Add to map
-						String eleTypeName = typeOf(eleType);
-						fieldMap.put(eleName, new Property(eleTypeName,null,containerOf));
+	private static Map<String,Model> parseModels(Type type, Map<String,Model> modelMap) {
+        if (isModelRequired(type)) {
+            String typeName = typeOf(type);
+            ClassDoc cd = type.asClassDoc();
+            if(cd!=null){
+                Model model = modelMap.get(typeName);
+                if(model == null){
+                    Map<String, Type> eleMap = new HashMap<String, Type>();
 
-						//If not primitive, build the model for it too 
-						if(!PRIMITIVES.contains(eleTypeName)){
-							parseModels(eleType,modelMap);
-						}
-					}
-					modelMap.put(typeName, new Model(typeName,fieldMap));
-				}
-			}
-		}
+                    //Get fields
+                    FieldDoc[] fdArr = cd.fields();
+                    if(fdArr!=null && fdArr.length>0){
+                        for(FieldDoc fd: fdArr){
+                            if(eleMap.get(fd.name())==null){
+                                eleMap.put(fd.name(), fd.type());
+                            }
+                        }
+                    }
+
+                    //Get methods
+                    MethodDoc[] mdArr = cd.methods();
+                    if(mdArr!=null && mdArr.length>0){
+                        for(MethodDoc md:mdArr){
+                            if(md.name().startsWith("get") && md.name().length()>3){
+                                String name = md.name().substring(3);
+                                name = name.substring(0,1).toLowerCase() + (name.length()>1?name.substring(1):"");
+                                if(eleMap.get(name)==null){
+                                    eleMap.put(name, md.returnType());
+                                }
+                            }
+                        }
+                    }
+
+                    //Process all fields & methods
+                    if(eleMap.keySet().size()>0){
+                        Map<String,Property> fieldMap = new HashMap<String, Property>();
+
+                        // Add the model in the map now to avoid StackOverflowException
+                        modelMap.put(typeName, new Model(typeName, fieldMap));
+
+                        for(String eleName: eleMap.keySet()){
+
+                            Type eleType = eleMap.get(eleName);
+
+                            //Check if it is a collection and get collection type
+                            String containerOf = null;
+                            ParameterizedType pt = eleType.asParameterizedType();
+                            if(pt!=null){
+                                Type[] typeArgs = pt.typeArguments();
+                                if(typeArgs!=null && typeArgs.length>0){
+                                    containerOf = typeOf(typeArgs[0]);
+                                    parseModels(typeArgs[0],modelMap);
+                                }
+                            }
+
+                            //Add to map
+                            String eleTypeName = typeOf(eleType);
+                            fieldMap.put(eleName, new Property(eleTypeName,null,containerOf));
+
+                            parseModels(eleType,modelMap);
+                        }
+                    }
+                }
+            }
+        }
 		return modelMap;
 	}
 
@@ -414,25 +409,23 @@ public class ServiceDoclet {
 	 * @return
 	 */
 	private static String typeOf(String javaType) {
-		String type = null;
+		String type = javaType.toLowerCase();
 		if (javaType.startsWith("java.lang.")) {
 			int i = javaType.lastIndexOf(".");
 			type = javaType.substring(i+1).toLowerCase();
-		} else 	if (PRIMITIVES.contains(javaType.toLowerCase())) {
-			type = javaType.toLowerCase();
 		} else if(javaType.equals("java.util.Date")) {
 			type = "Date";
 		} else {
 			int i = javaType.lastIndexOf(".");
-			if(i>=0){
+			if (i >= 0) {
 				type = javaType.substring(i+1);
 			} else {
 				type = javaType;	
 			}
 		}
-		if(type.equalsIgnoreCase("integer")){
+		if ("integer".equalsIgnoreCase(type)){
 			type = "int";
-		} else if(type.equalsIgnoreCase("arraylist") || type.equalsIgnoreCase("linkedlist")){
+		} else if("arraylist".equalsIgnoreCase(type) || "linkedlist".equalsIgnoreCase(type)){
 			type = "List";
 		}
 		return type;
@@ -441,9 +434,9 @@ public class ServiceDoclet {
 	private static String typeOf(Type type){
 		String name = null;
 		ClassDoc cd = type.asClassDoc();
-		if(cd!=null){
+		if (cd != null) {
 			name = getRootElementNameOf(cd);
-			if(name==null){
+			if (name == null) {
 				name = typeOf(type.qualifiedTypeName());
 			}
 		} else {
