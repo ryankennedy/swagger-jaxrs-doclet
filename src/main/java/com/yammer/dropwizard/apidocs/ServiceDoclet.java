@@ -235,6 +235,7 @@ public class ServiceDoclet {
 
     private static boolean isModelRequired(Type type) {
         return !type.isPrimitive() &&
+                !type.asClassDoc().isEnum() &&
                 !type.qualifiedTypeName().startsWith("java.") &&
                 !type.qualifiedTypeName().startsWith("javax.");
     }
@@ -435,10 +436,14 @@ public class ServiceDoclet {
 		String name = null;
 		ClassDoc cd = type.asClassDoc();
 		if (cd != null) {
-			name = getRootElementNameOf(cd);
-			if (name == null) {
-				name = typeOf(type.qualifiedTypeName());
-			}
+            if (cd.isEnum()) {
+                return "enum";
+            }
+
+            name = getRootElementNameOf(cd);
+            if (name == null) {
+                name = typeOf(type.qualifiedTypeName());
+            }
 		} else {
 			name = typeOf(type.qualifiedTypeName());
 		}
