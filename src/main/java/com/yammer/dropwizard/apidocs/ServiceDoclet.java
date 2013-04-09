@@ -32,6 +32,7 @@ public class ServiceDoclet {
 	public static final String JAX_RS_PATH = "javax.ws.rs.Path";
 	public static final String JAX_RS_PATH_PARAM = "javax.ws.rs.PathParam";
 	public static final String JAX_RS_QUERY_PARAM = "javax.ws.rs.QueryParam";
+    public static final String JAX_RS_HEADER_PARAM = "javax.ws.rs.HeaderParam";
 	public static final String XML_ROOT_ELEMENT = "javax.xml.bind.annotation.XmlRootElement";
 
 	private static String docBasePath = "http://localhost:8080";
@@ -350,7 +351,9 @@ public class ServiceDoclet {
 				return "path";
 			} else if (annotationTypeName.equals(JAX_RS_QUERY_PARAM)) {
 				return "query";
-			}
+			} else if (annotationTypeName.equals(JAX_RS_HEADER_PARAM)) {
+                return "header";
+            }
 		}
 		return "body";
 	}
@@ -389,7 +392,9 @@ public class ServiceDoclet {
 		AnnotationDesc[] annotations = parameter.annotations();
 		for (AnnotationDesc annotation : annotations) {
 			String annotationTypeName = annotation.annotationType().qualifiedTypeName();
-			if (annotationTypeName.equals(JAX_RS_PATH_PARAM)||annotationTypeName.equals(JAX_RS_QUERY_PARAM)) {
+			if (annotationTypeName.equals(JAX_RS_PATH_PARAM) ||
+                    annotationTypeName.equals(JAX_RS_QUERY_PARAM) ||
+                    annotationTypeName.equals(JAX_RS_HEADER_PARAM)) {
 				ElementValuePair[] evpArr = annotation.elementValues();
 				if(evpArr.length>0){
 					for(ElementValuePair evp:evpArr){
