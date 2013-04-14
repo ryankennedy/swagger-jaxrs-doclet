@@ -1,4 +1,4 @@
-# Swagger Doclet
+# Swagger Doclet [![Build Status](https://travis-ci.org/ryankennedy/swagger-jaxrs-doclet.png)](https://travis-ci.org/ryankennedy/swagger-jaxrs-doclet)
 
 A JavaDoc Doclet that can be used to generate a Swagger resource listing suitable for feeding to
 swagger-ui.
