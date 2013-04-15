@@ -297,31 +297,28 @@ public class ServiceDoclet {
 				//Process all fields & methods
 				if(eleMap.keySet().size()>0){
 					Map<String,Property> fieldMap = new HashMap<>();
-					for(String eleName: eleMap.keySet()){
+                    for (Map.Entry<String, Type> entry : eleMap.entrySet()) {
+                        //Check if it is a collection and get collection type
+                        String containerOf = null;
+                        ParameterizedType pt = entry.getValue().asParameterizedType();
+                        if(pt!=null){
+                            Type[] typeArgs = pt.typeArguments();
+                            if(typeArgs!=null && typeArgs.length>0){
+                                containerOf = typeOf(typeArgs[0]);
+                                if(!PRIMITIVES.contains(containerOf)){
+                                    parseModels(typeArgs[0],modelMap);
+                                }
+                            }
+                        }
 
-						Type eleType = eleMap.get(eleName);
+                        //Add to map
+                        String eleTypeName = typeOf(entry.getValue());
+                        fieldMap.put(entry.getKey(), new Property(eleTypeName,null,containerOf));
 
-						//Check if it is a collection and get collection type
-						String containerOf = null;
-						ParameterizedType pt = eleType.asParameterizedType();
-						if(pt!=null){
-							Type[] typeArgs = pt.typeArguments();
-							if(typeArgs!=null && typeArgs.length>0){
-								containerOf = typeOf(typeArgs[0]);
-								if(!PRIMITIVES.contains(containerOf)){
-									parseModels(typeArgs[0],modelMap);
-								}
-							}
-						}
-
-						//Add to map
-						String eleTypeName = typeOf(eleType);
-						fieldMap.put(eleName, new Property(eleTypeName,null,containerOf));
-
-						//If not primitive, build the model for it too
-						if(!PRIMITIVES.contains(eleTypeName)){
-							parseModels(eleType,modelMap);
-						}
+                        //If not primitive, build the model for it too
+                        if(!PRIMITIVES.contains(eleTypeName)){
+                            parseModels(entry.getValue(), modelMap);
+                        }
 					}
 					modelMap.put(typeName, new Model(typeName,fieldMap));
 				}
