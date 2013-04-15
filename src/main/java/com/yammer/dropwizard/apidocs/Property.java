@@ -10,7 +10,9 @@ public class Property {
 	private String description;
 	private String containerOf;
 	
-	public Property(){}
+	public Property() {
+
+    }
 	
 	public Property(String type, String description, String containerOf){
 		this.type = type;
