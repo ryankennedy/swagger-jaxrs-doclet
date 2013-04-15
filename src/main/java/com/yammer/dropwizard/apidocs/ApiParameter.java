@@ -36,7 +36,7 @@ public class ApiParameter {
     }
 
     public boolean getRequired() {
-        return (paramType.equals("query")?false:true);
+        return !paramType.equals("query");
     }
     
     public AllowableValues getAllowableValues() {
