@@ -6,7 +6,9 @@ public class AllowableValues {
 	private List<String> values;
 	
 	@SuppressWarnings("unused")
-	private AllowableValues(){};
+	private AllowableValues() {
+
+    }
 	
 	public AllowableValues(List<String> values){
 		this.values = values;
