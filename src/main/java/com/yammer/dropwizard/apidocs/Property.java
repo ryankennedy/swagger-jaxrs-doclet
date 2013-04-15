@@ -28,7 +28,7 @@ public class Property {
 	
     public AllowableValues getAllowableValues() {
     	if(type.equals("boolean")){
-    		List<String> values = new ArrayList<String>();
+    		List<String> values = new ArrayList<>();
     		values.add("false");
     		values.add("true");
     		return new AllowableValues(values);
@@ -40,7 +40,7 @@ public class Property {
     public Map<String,String> getItems(){
     	Map<String,String> result = null;
     	if(containerOf!=null){
-    		result = new HashMap<String,String>();
+    		result = new HashMap<>();
     		result.put("$ref", containerOf);
     	}
     	return result;
