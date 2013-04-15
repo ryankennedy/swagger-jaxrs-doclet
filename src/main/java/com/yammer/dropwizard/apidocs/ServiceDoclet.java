@@ -239,10 +239,11 @@ public class ServiceDoclet {
 
 				//First Sentence of Javadoc method description
 				Tag[] fst = method.firstSentenceTags();
-				String fss = "";
+				StringBuffer fssBuffer = new StringBuffer();
 				for(Tag t:fst){
-					fss += t.text();
+					fssBuffer.append(t.text());
 				}
+                String fss = fssBuffer.toString();
 
 				return new Method(desc.annotationType().name(),
 						method.name(),
