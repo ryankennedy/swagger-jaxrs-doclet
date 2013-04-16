@@ -8,7 +8,8 @@ public class Api {
     private List<Operation> operations;
 
     @SuppressWarnings("unused")
-	private Api() { }
+    private Api() {
+    }
 
     public Api(String path, String description, List<Operation> operations) {
         this.path = path;

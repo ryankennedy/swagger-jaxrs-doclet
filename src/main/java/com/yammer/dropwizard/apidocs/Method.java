@@ -12,7 +12,8 @@ public class Method {
     private String path;
 
     @SuppressWarnings("unused")
-	private Method() { }
+    private Method() {
+    }
 
     public Method(String method, String methodName, String path, List<ApiParameter> apiParameters, String firstSentence, String comment, String returnType) {
         this.method = method;
@@ -33,17 +34,17 @@ public class Method {
     }
 
     public String getPath() {
-    	return path;
+        return path;
     }
-    
+
     public List<ApiParameter> getParameters() {
         return apiParameters;
     }
 
     public String getFirstSentence() {
-    	return firstSentence;
+        return firstSentence;
     }
-    
+
     public String getComment() {
         return comment;
     }
@@ -51,8 +52,8 @@ public class Method {
     public String getReturnType() {
         return returnType;
     }
-    
-    public void setReturnType(String returnType){
-    	this.returnType = returnType;
+
+    public void setReturnType(String returnType) {
+        this.returnType = returnType;
     }
 }

@@ -10,7 +10,8 @@ public class ApiParameter {
     private String dataType;
 
     @SuppressWarnings("unused")
-	private ApiParameter() { }
+    private ApiParameter() {
+    }
 
     public ApiParameter(String paramType, String name, String description, String dataType) {
         this.paramType = paramType;
@@ -38,15 +39,15 @@ public class ApiParameter {
     public boolean getRequired() {
         return !paramType.equals("query");
     }
-    
+
     public AllowableValues getAllowableValues() {
-    	if(dataType.equals("boolean")){
-    		List<String> values = new ArrayList<>();
-    		values.add("false");
-    		values.add("true");
-    		return new AllowableValues(values);
-    	} else {
-    		return null;
-    	}
+        if (dataType.equals("boolean")) {
+            List<String> values = new ArrayList<>();
+            values.add("false");
+            values.add("true");
+            return new AllowableValues(values);
+        } else {
+            return null;
+        }
     }
 }

@@ -11,7 +11,8 @@ public class Operation {
     private String notes;
 
     @SuppressWarnings("unused")
-	private Operation() { }
+    private Operation() {
+    }
 
     public Operation(String httpMethod, String nickname, String responseClass, List<ApiParameter> parameters, String summary, String notes) {
         this.httpMethod = httpMethod;
@@ -41,8 +42,8 @@ public class Operation {
     public String getSummary() {
         return summary;
     }
-    
+
     public String getNotes() {
-    	return notes;
+        return notes;
     }
 }
