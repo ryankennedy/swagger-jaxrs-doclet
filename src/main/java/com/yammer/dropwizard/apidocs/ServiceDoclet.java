@@ -190,9 +190,6 @@ public class ServiceDoclet {
 
     /**
      * Gets the string representation of the jax-rs path from an array of annotations.
-     *
-     * @param annotations
-     * @return
      */
     private static String path(AnnotationDesc[] annotations) {
         for (AnnotationDesc annotationDesc : annotations) {
@@ -213,9 +210,6 @@ public class ServiceDoclet {
 
     /**
      * Turns a MethodDoc(Javadoc) into a swagger serialize-able method object.
-     *
-     * @param method
-     * @return
      */
     private static Method parseMethod(MethodDoc method) {
         for (AnnotationDesc desc : method.annotations()) {
@@ -259,9 +253,6 @@ public class ServiceDoclet {
 
     /**
      * Recursively adds models to the model map for a type
-     *
-     * @param modelMap
-     * @return
      */
     private static Map<String, Model> parseModels(Type type, Map<String, Model> modelMap) {
         String typeName = typeOf(type);
@@ -330,9 +321,6 @@ public class ServiceDoclet {
 
     /**
      * Determines if a parameter should be included, based upon annotation package.
-     *
-     * @param parameter
-     * @return
      */
     private static boolean shouldIncludeParameter(Parameter parameter) {
         AnnotationDesc[] annotations = parameter.annotations();
@@ -354,9 +342,6 @@ public class ServiceDoclet {
 
     /**
      * Determines the string representation of the parameter type.
-     *
-     * @param parameter
-     * @return
      */
     private static String paramTypeOf(Parameter parameter) {
         AnnotationDesc[] annotations = parameter.annotations();
@@ -373,9 +358,6 @@ public class ServiceDoclet {
 
     /**
      * Determines the XmlRootElement name. Returns null if no name found.
-     *
-     * @param classDoc
-     * @return
      */
     private static String getRootElementNameOf(ClassDoc classDoc) {
         AnnotationDesc[] annotations = classDoc.annotations();
@@ -397,9 +379,6 @@ public class ServiceDoclet {
 
     /**
      * Determines the string representation of the parameter name.
-     *
-     * @param parameter
-     * @return
      */
     private static String paramNameOf(Parameter parameter) {
         AnnotationDesc[] annotations = parameter.annotations();
@@ -421,9 +400,6 @@ public class ServiceDoclet {
 
     /**
      * Determines the String representation of the object Type.
-     *
-     * @param javaType
-     * @return
      */
     private static String typeOf(String javaType) {
         String type;
@@ -466,10 +442,6 @@ public class ServiceDoclet {
 
     /**
      * Gets the string representation of the parameter comment from the Javadoc.
-     *
-     * @param method
-     * @param parameter
-     * @return
      */
     private static String commentForParameter(MethodDoc method, Parameter parameter) {
         for (ParamTag tag : method.paramTags()) {
