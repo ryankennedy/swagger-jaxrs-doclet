@@ -77,14 +77,18 @@ public class ServiceDoclet {
     public static boolean start(RootDoc doc) {
         JavaDocParameters parameters = JavaDocParameters.parse(doc.options());
 
-        if (parameters.getDocBasePath() != null)
+        if (parameters.getDocBasePath() != null) {
             docBasePath = parameters.getDocBasePath();
-        if (parameters.getApiBasePath() != null)
+        }
+        if (parameters.getApiBasePath() != null) {
             apiBasePath = parameters.getApiBasePath();
-        if (parameters.getApiVersion() != null)
+        }
+        if (parameters.getApiVersion() != null) {
             apiVersion = parameters.getApiVersion();
-        if (parameters.getExcludeAnnotationClasses() != null)
+        }
+        if (parameters.getExcludeAnnotationClasses() != null) {
             excludeAnnotationClasses.addAll(parameters.getExcludeAnnotationClasses());
+        }
 
         Map<String, Map<String, List<Method>>> apiMap = new HashMap<>();
         Map<String, Map<String, Model>> modelMap = new HashMap<>();
