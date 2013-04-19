@@ -1,0 +1,10 @@
+{
+    "apiVersion": "0",
+    "basePath": "http://localhost:8080",
+    "apis": [
+        {
+            "path": "/foo.{format}",
+            "description": ""
+        }
+    ]
+}

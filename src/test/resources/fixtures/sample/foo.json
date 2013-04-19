@@ -1,0 +1,28 @@
+{
+    "apiVersion": "0",
+    "basePath": "http://localhost:8080",
+    "apis": [
+        {
+            "path": "/foo",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "nickname": "sayHello",
+                    "responseClass": "string",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "name",
+                            "description": null,
+                            "dataType": "string"
+                        }
+                    ],
+                    "summary": "",
+                    "notes": ""
+                }
+            ]
+        }
+    ],
+    "models": { }
+}

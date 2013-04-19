@@ -75,6 +75,10 @@ public class ServiceDoclet {
      * @return true on success.
      */
     public static boolean start(RootDoc doc) {
+        return startInternal(doc, new ObjectMapperRecorder());
+    }
+
+    public static boolean startInternal(RootDoc doc, Recorder recorder) {
         JavaDocParameters parameters = JavaDocParameters.parse(doc.options());
 
         if (parameters.getDocBasePath() != null) {
@@ -92,9 +96,6 @@ public class ServiceDoclet {
 
         Map<String, Map<String, List<Method>>> apiMap = new HashMap<>();
         Map<String, Map<String, Model>> modelMap = new HashMap<>();
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 
         try {
             List<ResourceListingAPI> builder = new LinkedList<>();
@@ -178,13 +179,13 @@ public class ServiceDoclet {
                 File apiFile = new File(parameters.getOutput(), rootPath + ".json");
                 ApiDeclaration declaration = new ApiDeclaration(apiVersion, apiBasePath, apiBuilder, modelMap.get(apiPath));
 
-                mapper.writeValue(apiFile, declaration);
+                recorder.record(apiFile, declaration);
             }
 
             //write out json for api
             ResourceListing listing = new ResourceListing(apiVersion, docBasePath, builder);
             File docFile = new File(parameters.getOutput(), "service.json");
-            mapper.writeValue(docFile, listing);
+            recorder.record(docFile, listing);
 
             return true;
         } catch (IOException e) {
@@ -515,5 +516,29 @@ public class ServiceDoclet {
      */
     public static LanguageVersion languageVersion() {
         return LanguageVersion.JAVA_1_5;
+    }
+
+    public static interface Recorder {
+        void record(File file, ResourceListing listing) throws IOException;
+
+        void record(File file, ApiDeclaration declaration) throws IOException;
+    }
+
+    private static class ObjectMapperRecorder implements Recorder {
+        private final ObjectMapper mapper = new ObjectMapper();
+
+        private ObjectMapperRecorder() {
+            mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        }
+
+        @Override
+        public void record(File file, ApiDeclaration declaration) throws IOException {
+            mapper.writeValue(file, declaration);
+        }
+
+        @Override
+        public void record(File file, ResourceListing listing) throws IOException {
+            mapper.writeValue(file, listing);
+        }
     }
 }
