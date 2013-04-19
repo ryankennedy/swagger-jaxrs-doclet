@@ -45,10 +45,10 @@ public class ServiceDocletTest {
         assertTrue("ServiceDoclet failed", ServiceDoclet.startInternal(rootDoc, recorder));
 
         // Validate the JSON structure against a fixture
-        final ResourceListing expectedListing = mapper.readValue(new File("src/test/resources/fixtures/sample/service.json"), ResourceListing.class);
+        final ResourceListing expectedListing = mapper.readValue(getClass().getResourceAsStream("/fixtures/sample/service.json"), ResourceListing.class);
         assertEquals(expectedListing, recorder.getListing(new File("service.json")));
 
-        final ApiDeclaration expectedDeclaration = mapper.readValue(new File("src/test/resources/fixtures/sample/foo.json"), ApiDeclaration.class);
+        final ApiDeclaration expectedDeclaration = mapper.readValue(getClass().getResourceAsStream("/fixtures/sample/foo.json"), ApiDeclaration.class);
         assertEquals(expectedDeclaration, recorder.getDeclaration(new File("foo.json")));
     }
 
