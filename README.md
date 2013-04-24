@@ -33,7 +33,7 @@ To use the Swagger Doclet in your Maven project, add the following to your POM f
                         <id>generate-service-docs</id>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <doclet>com.yammer.dropwizard.apidocs.ServiceDoclet</doclet>
+                            <doclet>ServiceDoclet</doclet>
                             <docletArtifact>
                                 <groupId>com.unclehulka</groupId>
                                 <artifactId>swagger-jaxrs-doclet</artifactId>
