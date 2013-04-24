@@ -5,6 +5,7 @@ import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.apidocs.sample.resources.AuthResource;
 import com.yammer.dropwizard.apidocs.sample.resources.GreetingsResource;
 import com.yammer.dropwizard.apidocs.sample.resources.HttpServletRequestResource;
+import com.yammer.dropwizard.apidocs.sample.resources.ResponseResource;
 import com.yammer.dropwizard.assets.AssetsBundle;
 import com.yammer.dropwizard.auth.AuthenticationException;
 import com.yammer.dropwizard.auth.Authenticator;
@@ -36,5 +37,6 @@ public class SampleService extends Service<Configuration> {
         environment.addResource(new GreetingsResource());
         environment.addResource(new HttpServletRequestResource());
         environment.addResource(new AuthResource());
+        environment.addResource(new ResponseResource());
     }
 }
