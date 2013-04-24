@@ -2,6 +2,7 @@ package com.yammer.dropwizard.apidocs.sample;
 
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.apidocs.sample.resources.GreetingsResource;
+import com.yammer.dropwizard.apidocs.sample.resources.HttpServletRequestResource;
 import com.yammer.dropwizard.assets.AssetsBundle;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Configuration;
@@ -20,5 +21,6 @@ public class SampleService extends Service<Configuration> {
     @Override
     public void run(Configuration configuration, Environment environment) throws Exception {
         environment.addResource(new GreetingsResource());
+        environment.addResource(new HttpServletRequestResource());
     }
 }
