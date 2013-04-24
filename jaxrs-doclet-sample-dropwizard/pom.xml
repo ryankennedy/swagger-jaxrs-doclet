@@ -12,11 +12,20 @@
 
     <artifactId>jaxrs-doclet-sample-dropwizard</artifactId>
 
+    <properties>
+        <dropwizard.version>0.6.2</dropwizard.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.yammer.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
-            <version>0.6.2</version>
+            <version>${dropwizard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yammer.dropwizard</groupId>
+            <artifactId>dropwizard-auth</artifactId>
+            <version>${dropwizard.version}</version>
         </dependency>
     </dependencies>
 
