@@ -36,12 +36,12 @@ To use the Swagger Doclet in your Maven project, add the following to your POM f
                             <doclet>ServiceDoclet</doclet>
                             <docletArtifact>
                                 <groupId>com.unclehulka</groupId>
-                                <artifactId>swagger-jaxrs-doclet</artifactId>
-                                <version>0.0.1.6-SNAPSHOT</version>
+                                <artifactId>jaxrs-doclet</artifactId>
+                                <version>0.0.2-SNAPSHOT</version>
                             </docletArtifact>
                             <reportOutputDirectory>${project.build.outputDirectory}</reportOutputDirectory>
                             <useStandardDocletOptions>false</useStandardDocletOptions>
-                            <additionalparam>-apiVersion 1 -docBasePath ${server.url} -apiBasePath ${server.url}</additionalparam>
+                            <additionalparam>-apiVersion 1 -docBasePath ${server.url}/apidocs -apiBasePath ${server.url}</additionalparam>
                         </configuration>
                         <goals>
                             <goal>javadoc</goal>
