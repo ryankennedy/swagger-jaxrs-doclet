@@ -6,7 +6,7 @@
 
     <parent>
         <artifactId>jaxrs-doclet-parent</artifactId>
-        <groupId>com.unclehulka</groupId>
+        <groupId>com.hypnoticocelot</groupId>
         <version>0.0.2-SNAPSHOT</version>
     </parent>
 
