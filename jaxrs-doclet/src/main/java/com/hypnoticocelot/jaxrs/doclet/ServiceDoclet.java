@@ -38,9 +38,6 @@ public class ServiceDoclet {
         add("javax.ws.rs.core.Context");
     }};
 
-    private static String docBasePath = "http://localhost:8080";
-    private static String apiBasePath = "http://localhost:8080";
-    private static String apiVersion = "0";
     /**
      * If a method parameter is annotated with one of these classes, exclude
      * from swagger documentation
@@ -67,7 +64,6 @@ public class ServiceDoclet {
         add("Date");
     }};
 
-
     /**
      * Generate documentation here.
      * This method is required for all doclets.
@@ -81,15 +77,6 @@ public class ServiceDoclet {
     public static boolean startInternal(RootDoc doc, Recorder recorder) {
         JavaDocParameters parameters = JavaDocParameters.parse(doc.options());
 
-        if (parameters.getDocBasePath() != null) {
-            docBasePath = parameters.getDocBasePath();
-        }
-        if (parameters.getApiBasePath() != null) {
-            apiBasePath = parameters.getApiBasePath();
-        }
-        if (parameters.getApiVersion() != null) {
-            apiVersion = parameters.getApiVersion();
-        }
         if (parameters.getExcludeAnnotationClasses() != null) {
             excludeAnnotationClasses.addAll(parameters.getExcludeAnnotationClasses());
         }
@@ -173,13 +160,13 @@ public class ServiceDoclet {
                 builder.add(new ResourceListingAPI("/" + rootPath + ".{format}", ""));
 
                 File apiFile = new File(parameters.getOutput(), rootPath + ".json");
-                ApiDeclaration declaration = new ApiDeclaration(apiVersion, apiBasePath, apiBuilder, modelMap.get(apiPath));
+                ApiDeclaration declaration = new ApiDeclaration(parameters.getApiVersion(), parameters.getApiBasePath(), apiBuilder, modelMap.get(apiPath));
 
                 recorder.record(apiFile, declaration);
             }
 
             //write out json for api
-            ResourceListing listing = new ResourceListing(apiVersion, docBasePath, builder);
+            ResourceListing listing = new ResourceListing(parameters.getApiVersion(), parameters.getDocBasePath(), builder);
             File docFile = new File(parameters.getOutput(), "service.json");
             recorder.record(docFile, listing);
 

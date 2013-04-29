@@ -7,9 +7,9 @@ import java.util.List;
 
 public class JavaDocParameters {
     private File output;
-    private String docBasePath;
-    private String apiBasePath;
-    private String apiVersion;
+    private String docBasePath = "http://localhost:8080";
+    private String apiBasePath = "http://localhost:8080";
+    private String apiVersion = "0";
     private List<String> excludeAnnotationClasses;
 
     private JavaDocParameters() {
