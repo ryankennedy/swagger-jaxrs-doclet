@@ -326,12 +326,8 @@ public class ServiceDoclet {
         AnnotationDesc[] annotations = parameter.annotations();
 
         //Include if it has no annotations
-        if (annotations == null || annotations.length == 0){
-            if (paramTypeOf(parameter).equalsIgnoreCase("body")){
-                return true;	
-            } else {
-                return false;
-            }
+        if (annotations == null || annotations.length == 0) {
+            return paramTypeOf(parameter).equalsIgnoreCase("body");
         }
 
         //Include if it has a jax-rs annotation
