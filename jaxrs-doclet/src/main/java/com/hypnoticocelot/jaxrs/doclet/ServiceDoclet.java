@@ -42,7 +42,7 @@ public class ServiceDoclet {
      * If a method parameter is annotated with one of these classes, exclude
      * from swagger documentation
      */
-    private static List<String> excludeAnnotationClasses = new ArrayList<>(JAX_RS_EXCLUDE_ANNOTATION_CLASSES);
+    private static List<String> excludeAnnotationClasses = new ArrayList<String>(JAX_RS_EXCLUDE_ANNOTATION_CLASSES);
 
     @SuppressWarnings("serial")
     public static final List<String> METHODS = new ArrayList<String>() {{
@@ -81,11 +81,11 @@ public class ServiceDoclet {
             excludeAnnotationClasses.addAll(parameters.getExcludeAnnotationClasses());
         }
 
-        Map<String, Map<String, List<Method>>> apiMap = new HashMap<>();
-        Map<String, Map<String, Model>> modelMap = new HashMap<>();
+        Map<String, Map<String, List<Method>>> apiMap = new HashMap<String, Map<String, List<Method>>>();
+        Map<String, Map<String, Model>> modelMap = new HashMap<String, Map<String, Model>>();
 
         try {
-            List<ResourceListingAPI> builder = new LinkedList<>();
+            List<ResourceListingAPI> builder = new LinkedList<ResourceListingAPI>();
 
             for (ClassDoc classDoc : doc.classes()) {
                 //go through each class
@@ -93,11 +93,11 @@ public class ServiceDoclet {
                 if (apiPath != null) {
                     Map<String, List<Method>> methodMap = apiMap.get(apiPath);
                     if (methodMap == null) {
-                        methodMap = new HashMap<>();
+                        methodMap = new HashMap<String, List<Method>>();
                     }
                     Map<String, Model> classModelMap = modelMap.get(apiPath);
                     if (classModelMap == null) {
-                        classModelMap = new HashMap<>();
+                        classModelMap = new HashMap<String, Model>();
                     }
 
                     //add all jax-rs annotated methods to the methodmap
@@ -106,7 +106,7 @@ public class ServiceDoclet {
                         if (me != null) {
                             List<Method> methods = methodMap.get(me.getPath());
                             if (methods == null) {
-                                methods = new ArrayList<>();
+                                methods = new ArrayList<Method>();
                             }
                             methods.add(me);
                             methodMap.put(me.getPath(), methods);
@@ -135,18 +135,18 @@ public class ServiceDoclet {
             }
 
             //Sort the classes based upon class path annotation
-            List<String> apiList = new ArrayList<>(apiMap.keySet());
+            List<String> apiList = new ArrayList<String>(apiMap.keySet());
             Collections.sort(apiList);
 
             for (String apiPath : apiList) {
-                List<Api> apiBuilder = new LinkedList<>();
+                List<Api> apiBuilder = new LinkedList<Api>();
 
                 Map<String, List<Method>> methodMap = apiMap.get(apiPath);
-                List<String> keyList = new ArrayList<>(methodMap.keySet());
+                List<String> keyList = new ArrayList<String>(methodMap.keySet());
                 Collections.sort(keyList);
                 for (String path : keyList) {
                     //turn list of methods into list of api objects
-                    List<Operation> methodBuilder = new LinkedList<>();
+                    List<Operation> methodBuilder = new LinkedList<Operation>();
 
                     for (Method me : methodMap.get(path)) {
                         methodBuilder.add(new Operation(me.getMethod(), me.getMethodName(), typeOf(me.getReturnType()),
@@ -208,7 +208,7 @@ public class ServiceDoclet {
                 if (path == null) path = "";
 
                 //Parameters
-                List<ApiParameter> parameterBuilder = new LinkedList<>();
+                List<ApiParameter> parameterBuilder = new LinkedList<ApiParameter>();
 
                 for (Parameter parameter : method.parameters()) {
                     if (shouldIncludeParameter(parameter)) {
@@ -249,7 +249,7 @@ public class ServiceDoclet {
             if (cd != null) {
                 Model model = modelMap.get(typeName);
                 if (model == null) {
-                    Map<String, Type> eleMap = new HashMap<>();
+                    Map<String, Type> eleMap = new HashMap<String, Type>();
 
                     //Get fields
                     FieldDoc[] fdArr = cd.fields();
@@ -279,7 +279,7 @@ public class ServiceDoclet {
                     if (eleMap.keySet().size() > 0) {
 
                         //Add to the model
-                        Map<String, Property> fieldMap = new HashMap<>();
+                        Map<String, Property> fieldMap = new HashMap<String, Property>();
                         for (Map.Entry<String, Type> entry : eleMap.entrySet()) {
                             //Check if it is a collection and get collection type
                             String containerOf = null;
@@ -467,7 +467,7 @@ public class ServiceDoclet {
      *         option not known.  Negative value means error occurred.
      */
     public static int optionLength(String option) {
-        Map<String, Integer> options = new HashMap<>();
+        Map<String, Integer> options = new HashMap<String, Integer>();
         options.put("-d", 2);
         options.put("-docBasePath", 2);
         options.put("-apiBasePath", 2);

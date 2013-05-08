@@ -32,7 +32,7 @@ public class ServiceDocletTest {
         compOpts.put("-sourcepath", "src/test/resources");
 
         Messager.preRegister(context, "Messager!");
-        final ListBuffer<String> subPackages = new ListBuffer<>();
+        final ListBuffer<String> subPackages = new ListBuffer<String>();
         subPackages.add("fixtures.sample");
         final JavadocTool javaDoc = JavadocTool.make0(context);
         final RootDoc rootDoc = javaDoc.getRootDocImpl("", null, new ModifierFilter(ModifierFilter.ALL_ACCESS),
@@ -56,8 +56,8 @@ public class ServiceDocletTest {
     }
 
     private class TestRecorder implements ServiceDoclet.Recorder {
-        private final Map<File, ResourceListing> listings = new HashMap<>();
-        private final Map<File, ApiDeclaration> declarations = new HashMap<>();
+        private final Map<File, ResourceListing> listings = new HashMap<File, ResourceListing>();
+        private final Map<File, ApiDeclaration> declarations = new HashMap<File, ApiDeclaration>();
 
         public ResourceListing getListing(File file) {
             return listings.get(file);
