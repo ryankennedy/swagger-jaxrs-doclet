@@ -12,8 +12,6 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
 import com.sun.javadoc.ClassDoc;
@@ -113,21 +111,23 @@ public class ServiceDoclet {
                             methods.add(me);
                             methodMap.put(me.getPath(), methods);
 
-                            //build model for body parameter
-                            for (Parameter parameter : method.parameters()) {
-                                if (shouldIncludeParameter(parameter)) {
-                                    classModelMap = parseModels(parameter.type(), classModelMap);
+                            if(parameters.isParseModels()){
+                                //build models for method parameters
+                                for (Parameter parameter : method.parameters()) {
+                                    if (shouldIncludeParameter(parameter)) {
+                                        classModelMap = parseModels(parameter.type(), classModelMap);
+                                    }
                                 }
-                            }
 
-                            //build model for return type
-                            Type type = method.returnType();
-                            if (!type.simpleTypeName().equalsIgnoreCase("void")) {
-                                String name = typeOf(type);
-                                if (me.getReturnType() == null || !me.getReturnType().equals(name)) {
-                                    me.setReturnType(name);
+                                //build model for method return type
+                                Type type = method.returnType();
+                                if (!type.simpleTypeName().equalsIgnoreCase("void")) {
+                                    String name = typeOf(type);
+                                    if (me.getReturnType() == null || !me.getReturnType().equals(name)) {
+                                        me.setReturnType(name);
+                                    }
+                                    classModelMap = parseModels(type, classModelMap);
                                 }
-                                classModelMap = parseModels(type, classModelMap);
                             }
                         }
                     }
@@ -475,6 +475,7 @@ public class ServiceDoclet {
         options.put("-apiBasePath", 2);
         options.put("-apiVersion", 2);
         options.put("-excludeAnnotationClasses", 2);
+        options.put("-disableModels", 1);
 
         Integer value = options.get(option);
         if (value != null) {

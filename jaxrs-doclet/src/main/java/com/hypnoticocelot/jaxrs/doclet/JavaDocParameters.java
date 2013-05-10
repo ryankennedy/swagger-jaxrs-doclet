@@ -11,6 +11,7 @@ public class JavaDocParameters {
     private String apiBasePath = "http://localhost:8080";
     private String apiVersion = "0";
     private List<String> excludeAnnotationClasses;
+    private boolean parseModels = true;
 
     private JavaDocParameters() {
     }
@@ -35,6 +36,10 @@ public class JavaDocParameters {
         return excludeAnnotationClasses;
     }
 
+    public boolean isParseModels() {
+        return parseModels;
+    }
+
     /**
      * Parse javadoc doclet options
      *
@@ -46,6 +51,7 @@ public class JavaDocParameters {
      *                  -docBasePath http://localhost:8080
      *                  -apiBasePath http://localhost:8080
      *                  -excludeAnnotationClasses com.example.Context com.example.Auth
+     *                  -disableModels
      *                  </pre>
      *                </p>
      * @return parsed javadoc parameters
@@ -66,6 +72,8 @@ public class JavaDocParameters {
                 parameters.apiVersion = option[1];
             } else if (option[0].equals("-excludeAnnotationClasses")) {
                 parameters.excludeAnnotationClasses = Arrays.asList(Arrays.copyOfRange(option, 1, option.length));
+            } else if (option[0].equals("-disableModels")) {
+                parameters.parseModels = false;
             }
         }
 
