@@ -24,7 +24,7 @@ public class SampleService extends Service<Configuration> {
 
     @Override
     public void run(Configuration configuration, Environment environment) throws Exception {
-        environment.addProvider(new BasicAuthProvider<>(new Authenticator<BasicCredentials, String>() {
+        environment.addProvider(new BasicAuthProvider<String>(new Authenticator<BasicCredentials, String>() {
             @Override
             public Optional<String> authenticate(BasicCredentials basicCredentials) throws AuthenticationException {
                 return Optional.of("USERNAME");

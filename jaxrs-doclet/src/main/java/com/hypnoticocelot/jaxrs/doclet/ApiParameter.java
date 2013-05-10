@@ -42,7 +42,7 @@ public class ApiParameter {
 
     public AllowableValues getAllowableValues() {
         if (dataType.equals("boolean")) {
-            List<String> values = new ArrayList<>();
+            List<String> values = new ArrayList<String>();
             values.add("false");
             values.add("true");
             return new AllowableValues(values);
