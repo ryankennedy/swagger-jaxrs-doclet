@@ -17,6 +17,13 @@ To use the Swagger Doclet in your Maven project, add the following to your POM f
     <groupId>…</groupId>
     <artifactId>…</artifactId>
     <version>…</version>
+    
+    <repositories>
+        <repository>
+            <id>com.hypnoticocelot</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         …
