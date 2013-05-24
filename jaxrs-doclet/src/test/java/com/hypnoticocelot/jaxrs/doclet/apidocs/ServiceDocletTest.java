@@ -1,6 +1,7 @@
 package com.hypnoticocelot.jaxrs.doclet.apidocs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.ByteStreams;
 import com.hypnoticocelot.jaxrs.doclet.ApiDeclaration;
 import com.hypnoticocelot.jaxrs.doclet.ResourceListing;
 import com.hypnoticocelot.jaxrs.doclet.ServiceDoclet;
@@ -15,6 +16,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,6 +60,7 @@ public class ServiceDocletTest {
     private class TestRecorder implements ServiceDoclet.Recorder {
         private final Map<File, ResourceListing> listings = new HashMap<File, ResourceListing>();
         private final Map<File, ApiDeclaration> declarations = new HashMap<File, ApiDeclaration>();
+        private final Map<File, byte[]> rawFiles = new HashMap<File, byte[]>();
 
         public ResourceListing getListing(File file) {
             return listings.get(file);
@@ -75,6 +78,11 @@ public class ServiceDocletTest {
         @Override
         public void record(File file, ApiDeclaration declaration) throws IOException {
             declarations.put(file, declaration);
+        }
+
+        @Override
+        public void record(File file, InputStream stream) throws IOException {
+            rawFiles.put(file, ByteStreams.toByteArray(stream));
         }
     }
 }

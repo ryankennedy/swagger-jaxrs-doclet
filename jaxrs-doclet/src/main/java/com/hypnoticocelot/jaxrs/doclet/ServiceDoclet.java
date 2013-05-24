@@ -1,17 +1,24 @@
 package com.hypnoticocelot.jaxrs.doclet;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
 import com.sun.javadoc.ClassDoc;
@@ -171,6 +178,23 @@ public class ServiceDoclet {
             ResourceListing listing = new ResourceListing(parameters.getApiVersion(), parameters.getDocBasePath(), builder);
             File docFile = new File(parameters.getOutput(), "service.json");
             recorder.record(docFile, listing);
+
+            // Copy swagger-ui into the output directory.
+            final ZipInputStream swaggerZip = new ZipInputStream(ServiceDoclet.class.getResourceAsStream("/swagger-ui.zip"));
+            ZipEntry entry = swaggerZip.getNextEntry();
+            while (entry != null) {
+                final File swaggerFile = new File(parameters.getOutput(), entry.getName());
+                if (entry.isDirectory()) {
+                    if (!swaggerFile.isDirectory() && !swaggerFile.mkdirs()) {
+                        throw new RuntimeException("Unable to create directory: " + swaggerFile);
+                    }
+                } else {
+                    recorder.record(swaggerFile, swaggerZip);
+                }
+
+                entry = swaggerZip.getNextEntry();
+            }
+            swaggerZip.close();
 
             return true;
         } catch (IOException e) {
@@ -521,6 +545,8 @@ public class ServiceDoclet {
         void record(File file, ResourceListing listing) throws IOException;
 
         void record(File file, ApiDeclaration declaration) throws IOException;
+
+        void record(File file, InputStream stream) throws IOException;
     }
 
     private static class ObjectMapperRecorder implements Recorder {
@@ -539,6 +565,14 @@ public class ServiceDoclet {
         @Override
         public void record(File file, ResourceListing listing) throws IOException {
             mapper.writeValue(file, listing);
+        }
+
+        @Override
+        public void record(File file, InputStream stream) throws IOException {
+            final FileOutputStream outputStream = new FileOutputStream(file);
+            ByteStreams.copy(stream, outputStream);
+            outputStream.flush();
+            outputStream.close();
         }
     }
 }
