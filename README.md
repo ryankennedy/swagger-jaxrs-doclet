@@ -54,7 +54,7 @@ To use the Swagger Doclet in your Maven project, add the following to your POM f
                             </docletArtifact>
                             <reportOutputDirectory>${project.build.outputDirectory}</reportOutputDirectory>
                             <useStandardDocletOptions>false</useStandardDocletOptions>
-                            <additionalparam>-apiVersion 1 -docBasePath ${server.url}/apidocs -apiBasePath ${server.url}</additionalparam>
+                            <additionalparam>-apiVersion 1 -docBasePath /apidocs -apiBasePath /</additionalparam>
                         </configuration>
                         <goals>
                             <goal>javadoc</goal>
