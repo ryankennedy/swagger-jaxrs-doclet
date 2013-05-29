@@ -4,18 +4,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.base.Predicate;
 import com.google.common.io.ByteStreams;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
@@ -30,6 +26,8 @@ import com.sun.javadoc.ParameterizedType;
 import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Tag;
 import com.sun.javadoc.Type;
+
+import static com.google.common.collect.Collections2.filter;
 
 public class ServiceDoclet {
     public static final String JAX_RS_ANNOTATION_PACKAGE = "javax.ws.rs";
@@ -48,14 +46,6 @@ public class ServiceDoclet {
      * from swagger documentation
      */
     private static List<String> excludeAnnotationClasses = new ArrayList<String>(JAX_RS_EXCLUDE_ANNOTATION_CLASSES);
-
-    @SuppressWarnings("serial")
-    public static final List<String> METHODS = new ArrayList<String>() {{
-        add("javax.ws.rs.GET");
-        add("javax.ws.rs.PUT");
-        add("javax.ws.rs.POST");
-        add("javax.ws.rs.DELETE");
-    }};
 
     @SuppressWarnings("serial")
     public static final List<String> PRIMITIVES = new ArrayList<String>() {{
@@ -119,7 +109,7 @@ public class ServiceDoclet {
                             if(parameters.isParseModels()){
                                 //build models for method parameters
                                 for (Parameter parameter : method.parameters()) {
-                                    if (shouldIncludeParameter(parameter)) {
+                                    if (shouldIncludeParameter(me.getMethod(), parameter)) {
                                         classModelMap = parseModels(parameter.type(), classModelMap);
                                     }
                                 }
@@ -224,43 +214,42 @@ public class ServiceDoclet {
      * Turns a MethodDoc(Javadoc) into a swagger serialize-able method object.
      */
     private static Method parseMethod(MethodDoc method) {
-        for (AnnotationDesc desc : method.annotations()) {
-            if (METHODS.contains(desc.annotationType().qualifiedTypeName())) {
+        HttpMethod httpMethod = HttpMethod.fromMethod(method);
+        if (httpMethod == null) {
+            return null;
+        }
 
-                //Path
-                String path = path(method.annotations());
-                if (path == null) path = "";
+        //Path
+        String path = path(method.annotations());
+        if (path == null) path = "";
 
-                //Parameters
-                List<ApiParameter> parameterBuilder = new LinkedList<ApiParameter>();
+        //Parameters
+        List<ApiParameter> parameterBuilder = new LinkedList<ApiParameter>();
 
-                for (Parameter parameter : method.parameters()) {
-                    if (shouldIncludeParameter(parameter)) {
-                        String parameterComment = commentForParameter(method, parameter);
-                        parameterBuilder.add(new ApiParameter(paramTypeOf(parameter), paramNameOf(parameter),
-                                parameterComment,
-                                typeOf(parameter.type())));
-                    }
-                }
-
-                //First Sentence of Javadoc method description
-                Tag[] fst = method.firstSentenceTags();
-                StringBuilder fssBuffer = new StringBuilder();
-                for (Tag t : fst) {
-                    fssBuffer.append(t.text());
-                }
-                String fss = fssBuffer.toString();
-
-                return new Method(desc.annotationType().name(),
-                        method.name(),
-                        path,
-                        parameterBuilder,
-                        fss,
-                        method.commentText().replace(fss, ""),
-                        method.returnType().qualifiedTypeName());
+        for (Parameter parameter : method.parameters()) {
+            if (shouldIncludeParameter(httpMethod, parameter)) {
+                String parameterComment = commentForParameter(method, parameter);
+                parameterBuilder.add(new ApiParameter(paramTypeOf(parameter), paramNameOf(parameter),
+                        parameterComment,
+                        typeOf(parameter.type())));
             }
         }
-        return null;
+
+        //First Sentence of Javadoc method description
+        Tag[] fst = method.firstSentenceTags();
+        StringBuilder fssBuffer = new StringBuilder();
+        for (Tag t : fst) {
+            fssBuffer.append(t.text());
+        }
+        String fss = fssBuffer.toString();
+
+        return new Method(httpMethod,
+                method.name(),
+                path,
+                parameterBuilder,
+                fss,
+                method.commentText().replace(fss, ""),
+                method.returnType().qualifiedTypeName());
     }
 
     /**
@@ -346,21 +335,20 @@ public class ServiceDoclet {
     /**
      * Determines if a parameter should be included, based upon annotation package.
      */
-    private static boolean shouldIncludeParameter(Parameter parameter) {
-        AnnotationDesc[] annotations = parameter.annotations();
-
-        //Include if it has no annotations
-        if (annotations == null || annotations.length == 0) {
-            return paramTypeOf(parameter).equalsIgnoreCase("body");
+    private static boolean shouldIncludeParameter(HttpMethod httpMethod, Parameter parameter) {
+        List<AnnotationDesc> allAnnotations = Arrays.asList(parameter.annotations());
+        Collection<AnnotationDesc> excluded = filter(allAnnotations, new ExcludedAnnotations());
+        if (!excluded.isEmpty()) {
+            return false;
         }
 
-        //Include if it has a jax-rs annotation
-        for (AnnotationDesc annotation : annotations) {
-            String annotationClass = annotation.annotationType().qualifiedTypeName();
-            if (annotationClass.startsWith(JAX_RS_ANNOTATION_PACKAGE)
-                    && !excludeAnnotationClasses.contains(annotationClass)) {
-                return true;
-            }
+        Collection<AnnotationDesc> jaxRsAnnotations = filter(allAnnotations, new JaxRsAnnotations());
+        if (!jaxRsAnnotations.isEmpty()) {
+            return true;
+        }
+
+        if (allAnnotations.isEmpty() || httpMethod == HttpMethod.POST) {
+            return paramTypeOf(parameter).equalsIgnoreCase("body");
         }
         return false;
     }
@@ -571,6 +559,22 @@ public class ServiceDoclet {
             ByteStreams.copy(stream, outputStream);
             outputStream.flush();
             outputStream.close();
+        }
+    }
+
+    private static class ExcludedAnnotations implements Predicate<AnnotationDesc> {
+        @Override
+        public boolean apply(AnnotationDesc annotationDesc) {
+            String annotationClass = annotationDesc.annotationType().qualifiedTypeName();
+            return excludeAnnotationClasses.contains(annotationClass);
+        }
+    }
+
+    private static class JaxRsAnnotations implements Predicate<AnnotationDesc> {
+        @Override
+        public boolean apply(AnnotationDesc annotationDesc) {
+            String annotationClass = annotationDesc.annotationType().qualifiedTypeName();
+            return annotationClass.startsWith(JAX_RS_ANNOTATION_PACKAGE);
         }
     }
 }
