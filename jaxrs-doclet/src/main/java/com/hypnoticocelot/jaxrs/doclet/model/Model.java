@@ -1,4 +1,4 @@
-package com.hypnoticocelot.jaxrs.doclet;
+package com.hypnoticocelot.jaxrs.doclet.model;
 
 import java.util.Map;
 

@@ -2,9 +2,10 @@ package com.hypnoticocelot.jaxrs.doclet.apidocs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
-import com.hypnoticocelot.jaxrs.doclet.ApiDeclaration;
-import com.hypnoticocelot.jaxrs.doclet.ResourceListing;
+import com.hypnoticocelot.jaxrs.doclet.Recorder;
 import com.hypnoticocelot.jaxrs.doclet.ServiceDoclet;
+import com.hypnoticocelot.jaxrs.doclet.model.ApiDeclaration;
+import com.hypnoticocelot.jaxrs.doclet.model.ResourceListing;
 import com.sun.javadoc.RootDoc;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.ListBuffer;
@@ -57,7 +58,7 @@ public class ServiceDocletTest {
         assertEquals(expectedDeclaration, recorder.getDeclaration(new File("foo.json")));
     }
 
-    private class TestRecorder implements ServiceDoclet.Recorder {
+    private class TestRecorder implements Recorder {
         private final Map<File, ResourceListing> listings = new HashMap<File, ResourceListing>();
         private final Map<File, ApiDeclaration> declarations = new HashMap<File, ApiDeclaration>();
         private final Map<File, byte[]> rawFiles = new HashMap<File, byte[]>();

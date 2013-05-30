@@ -1,4 +1,4 @@
-package com.hypnoticocelot.jaxrs.doclet;
+package com.hypnoticocelot.jaxrs.doclet.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +10,8 @@ public class Property {
     private String description;
     private String containerOf;
 
-    private Property() { }
+    private Property() {
+    }
 
     public Property(String type, String description, String containerOf) {
         this.type = type;

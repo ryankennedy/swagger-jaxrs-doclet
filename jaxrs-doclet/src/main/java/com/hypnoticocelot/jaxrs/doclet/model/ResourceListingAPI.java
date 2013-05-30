@@ -1,4 +1,4 @@
-package com.hypnoticocelot.jaxrs.doclet;
+package com.hypnoticocelot.jaxrs.doclet.model;
 
 public class ResourceListingAPI {
     private String path;
