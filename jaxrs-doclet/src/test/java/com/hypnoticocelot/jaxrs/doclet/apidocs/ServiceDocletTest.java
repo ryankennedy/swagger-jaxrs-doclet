@@ -2,10 +2,11 @@ package com.hypnoticocelot.jaxrs.doclet.apidocs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
+import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
 import com.hypnoticocelot.jaxrs.doclet.Recorder;
-import com.hypnoticocelot.jaxrs.doclet.ServiceDoclet;
 import com.hypnoticocelot.jaxrs.doclet.model.ApiDeclaration;
 import com.hypnoticocelot.jaxrs.doclet.model.ResourceListing;
+import com.hypnoticocelot.jaxrs.doclet.parser.JaxRsAnnotationParser;
 import com.sun.javadoc.RootDoc;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.ListBuffer;
@@ -48,7 +49,9 @@ public class ServiceDocletTest {
 
         // Parse the RootDoc with ServiceDoclet to a JSON structure
         final TestRecorder recorder = new TestRecorder();
-        assertTrue("ServiceDoclet failed", ServiceDoclet.startInternal(rootDoc, recorder));
+        DocletOptions options = DocletOptions.parse(rootDoc.options());
+        options.setRecorder(recorder);
+        assertTrue("ServiceDoclet failed", new JaxRsAnnotationParser(options).parse(rootDoc));
 
         // Validate the JSON structure against a fixture
         final ResourceListing expectedListing = mapper.readValue(getClass().getResourceAsStream("/fixtures/sample/service.json"), ResourceListing.class);

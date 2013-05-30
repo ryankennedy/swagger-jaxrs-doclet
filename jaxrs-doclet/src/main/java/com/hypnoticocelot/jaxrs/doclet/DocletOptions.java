@@ -15,6 +15,7 @@ public class DocletOptions {
     private String apiVersion = "0";
     private List<String> excludeAnnotationClasses;
     private boolean parseModels = true;
+    private Recorder recorder = new ObjectMapperRecorder();
 
     private DocletOptions() {
         excludeAnnotationClasses = new ArrayList<String>();
@@ -44,6 +45,14 @@ public class DocletOptions {
 
     public boolean isParseModels() {
         return parseModels;
+    }
+
+    public Recorder getRecorder() {
+        return recorder;
+    }
+
+    public void setRecorder(Recorder recorder) {
+        this.recorder = recorder;
     }
 
     public static DocletOptions parse(String[][] options) {

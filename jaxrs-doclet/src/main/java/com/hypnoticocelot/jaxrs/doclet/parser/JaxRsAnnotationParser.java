@@ -2,8 +2,6 @@ package com.hypnoticocelot.jaxrs.doclet.parser;
 
 import com.google.common.base.Predicate;
 import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
-import com.hypnoticocelot.jaxrs.doclet.ObjectMapperRecorder;
-import com.hypnoticocelot.jaxrs.doclet.Recorder;
 import com.hypnoticocelot.jaxrs.doclet.ServiceDoclet;
 import com.hypnoticocelot.jaxrs.doclet.model.*;
 import com.sun.javadoc.*;
@@ -39,14 +37,12 @@ public class JaxRsAnnotationParser {
     // ----------------------------------------------------------------------
 
     private final DocletOptions options;
-    private final Recorder recorder;
 
     private final Map<String, Map<String, List<Method>>> apiMap;
     private final Map<String, Map<String, Model>> modelMap;
 
     public JaxRsAnnotationParser(DocletOptions options) {
         this.options = options;
-        this.recorder = new ObjectMapperRecorder();
         apiMap = new HashMap<String, Map<String, List<Method>>>();
         modelMap = new HashMap<String, Map<String, Model>>();
     }
@@ -132,13 +128,13 @@ public class JaxRsAnnotationParser {
                 File apiFile = new File(options.getOutput(), rootPath + ".json");
                 ApiDeclaration declaration = new ApiDeclaration(options.getApiVersion(), options.getApiBasePath(), apiBuilder, modelMap.get(apiPath));
 
-                recorder.record(apiFile, declaration);
+                options.getRecorder().record(apiFile, declaration);
             }
 
             //write out json for api
             ResourceListing listing = new ResourceListing(options.getApiVersion(), options.getDocBasePath(), builder);
             File docFile = new File(options.getOutput(), "service.json");
-            recorder.record(docFile, listing);
+            options.getRecorder().record(docFile, listing);
 
             // Copy swagger-ui into the output directory.
             final ZipInputStream swaggerZip = new ZipInputStream(ServiceDoclet.class.getResourceAsStream("/swagger-ui.zip"));
@@ -150,7 +146,7 @@ public class JaxRsAnnotationParser {
                         throw new RuntimeException("Unable to create directory: " + swaggerFile);
                     }
                 } else {
-                    recorder.record(swaggerFile, swaggerZip);
+                    options.getRecorder().record(swaggerFile, swaggerZip);
                 }
 
                 entry = swaggerZip.getNextEntry();
