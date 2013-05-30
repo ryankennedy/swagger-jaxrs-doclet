@@ -1,17 +1,19 @@
 package com.hypnoticocelot.jaxrs.doclet.model;
 
-import java.util.List;
+import com.google.common.base.Objects;
+
+import java.util.Collection;
 
 public class Api {
     private String path;
     private String description;
-    private List<Operation> operations;
+    private Collection<Operation> operations;
 
     @SuppressWarnings("unused")
     private Api() {
     }
 
-    public Api(String path, String description, List<Operation> operations) {
+    public Api(String path, String description, Collection<Operation> operations) {
         this.path = path;
         this.description = description;
         this.operations = operations;
@@ -25,7 +27,7 @@ public class Api {
         return description;
     }
 
-    public List<Operation> getOperations() {
+    public Collection<Operation> getOperations() {
         return operations;
     }
 
@@ -36,9 +38,9 @@ public class Api {
 
         Api api = (Api) o;
 
+        if (path != null ? !path.equals(api.path) : api.path != null) return false;
         if (description != null ? !description.equals(api.description) : api.description != null) return false;
         if (operations != null ? !operations.equals(api.operations) : api.operations != null) return false;
-        if (path != null ? !path.equals(api.path) : api.path != null) return false;
 
         return true;
     }
@@ -53,10 +55,10 @@ public class Api {
 
     @Override
     public String toString() {
-        return "Api{" +
-                "path='" + path + '\'' +
-                ", description='" + description + '\'' +
-                ", operations=" + operations +
-                '}';
+        return "\n--->" + Objects.toStringHelper(this)
+                .add("path", path)
+                .add("description", description)
+                .add("operations", operations)
+                .toString();
     }
 }

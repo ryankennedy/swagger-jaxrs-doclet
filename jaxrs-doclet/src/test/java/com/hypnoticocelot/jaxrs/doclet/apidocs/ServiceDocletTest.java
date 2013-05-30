@@ -22,7 +22,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class ServiceDocletTest {
@@ -51,14 +52,13 @@ public class ServiceDocletTest {
         final TestRecorder recorder = new TestRecorder();
         DocletOptions options = DocletOptions.parse(rootDoc.options());
         options.setRecorder(recorder);
-        assertTrue("ServiceDoclet failed", new JaxRsAnnotationParser(options).parse(rootDoc));
+        assertTrue("ServiceDoclet failed", new JaxRsAnnotationParser(options, rootDoc).run());
 
-        // Validate the JSON structure against a fixture
         final ResourceListing expectedListing = mapper.readValue(getClass().getResourceAsStream("/fixtures/sample/service.json"), ResourceListing.class);
-        assertEquals(expectedListing, recorder.getListing(new File("service.json")));
+        assertThat(recorder.getListing(new File("service.json")), equalTo(expectedListing));
 
         final ApiDeclaration expectedDeclaration = mapper.readValue(getClass().getResourceAsStream("/fixtures/sample/foo.json"), ApiDeclaration.class);
-        assertEquals(expectedDeclaration, recorder.getDeclaration(new File("foo.json")));
+        assertThat(recorder.getDeclaration(new File("foo.json")), equalTo(expectedDeclaration));
     }
 
     private class TestRecorder implements Recorder {

@@ -1,8 +1,11 @@
 package com.hypnoticocelot.jaxrs.doclet.model;
 
+import com.hypnoticocelot.jaxrs.doclet.parser.AnnotationHelper;
+
 import java.util.List;
 
 public class Operation {
+
     private HttpMethod httpMethod;
     private String nickname;
     private String responseClass; // void, primitive, complex or a container
@@ -14,13 +17,13 @@ public class Operation {
     private Operation() {
     }
 
-    public Operation(HttpMethod httpMethod, String nickname, String responseClass, List<ApiParameter> parameters, String summary, String notes) {
-        this.httpMethod = httpMethod;
-        this.nickname = nickname;
-        this.responseClass = responseClass;
-        this.parameters = parameters;
-        this.summary = summary;
-        this.notes = notes;
+    public Operation(Method method) {
+        this.httpMethod = method.getMethod();
+        this.nickname = method.getMethodName();
+        this.responseClass = AnnotationHelper.typeOf(method.getReturnType());
+        this.parameters = method.getParameters();
+        this.summary = method.getFirstSentence();
+        this.notes = method.getComment();
     }
 
     public HttpMethod getHttpMethod() {

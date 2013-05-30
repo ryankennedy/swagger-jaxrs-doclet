@@ -17,7 +17,7 @@ public class ServiceDoclet {
      */
     public static boolean start(RootDoc doc) {
         DocletOptions options = DocletOptions.parse(doc.options());
-        return new JaxRsAnnotationParser(options).parse(doc);
+        return new JaxRsAnnotationParser(options, doc).run();
     }
 
     /**
