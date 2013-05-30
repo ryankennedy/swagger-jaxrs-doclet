@@ -3,7 +3,7 @@ package com.hypnoticocelot.jaxrs.doclet;
 import java.util.List;
 
 public class Operation {
-    private String httpMethod;
+    private HttpMethod httpMethod;
     private String nickname;
     private String responseClass; // void, primitive, complex or a container
     private List<ApiParameter> parameters;
@@ -14,7 +14,7 @@ public class Operation {
     private Operation() {
     }
 
-    public Operation(String httpMethod, String nickname, String responseClass, List<ApiParameter> parameters, String summary, String notes) {
+    public Operation(HttpMethod httpMethod, String nickname, String responseClass, List<ApiParameter> parameters, String summary, String notes) {
         this.httpMethod = httpMethod;
         this.nickname = nickname;
         this.responseClass = responseClass;
@@ -23,7 +23,7 @@ public class Operation {
         this.notes = notes;
     }
 
-    public String getHttpMethod() {
+    public HttpMethod getHttpMethod() {
         return httpMethod;
     }
 
