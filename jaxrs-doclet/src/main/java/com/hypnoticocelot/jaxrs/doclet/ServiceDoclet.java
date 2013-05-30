@@ -347,10 +347,7 @@ public class ServiceDoclet {
             return true;
         }
 
-        if (allAnnotations.isEmpty() || httpMethod == HttpMethod.POST) {
-            return paramTypeOf(parameter).equalsIgnoreCase("body");
-        }
-        return false;
+        return (allAnnotations.isEmpty() || httpMethod == HttpMethod.POST);
     }
 
     /**
