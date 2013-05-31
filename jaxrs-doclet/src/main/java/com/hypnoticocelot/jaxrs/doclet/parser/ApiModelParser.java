@@ -5,51 +5,49 @@ import com.hypnoticocelot.jaxrs.doclet.model.Model;
 import com.hypnoticocelot.jaxrs.doclet.model.Property;
 import com.sun.javadoc.*;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.*;
 
 import static com.google.common.collect.Collections2.transform;
 
 public class ApiModelParser {
 
     private final Type rootType;
-    private final Collection<Model> models;
+    private final Set<Model> models;
 
     public ApiModelParser(Type rootType) {
         this.rootType = rootType;
         this.models = new LinkedHashSet<Model>();
     }
 
-    public Collection<Model> parse() {
-        findModels(rootType);
+    public Set<Model> parse() {
+        parseModel(rootType);
         return models;
     }
 
-    private void findModels(Type type) {
-        String typeName = AnnotationHelper.typeOf(type);
-        if (AnnotationHelper.PRIMITIVES.contains(typeName) || type.qualifiedTypeName().startsWith("javax.")) {
-            return;
-        }
-
+    private void parseModel(Type type) {
+        String typeName = AnnotationHelper.typeIdOf(type);
+        boolean isPrimitive = /* type.isPrimitive()? || */ AnnotationHelper.PRIMITIVES.contains(typeName);
+        boolean isJavaxType = type.qualifiedTypeName().startsWith("javax.");
         ClassDoc classDoc = type.asClassDoc();
-        if (classDoc == null) {
+        if (isPrimitive || isJavaxType || classDoc == null || alreadyStoredType(typeName)) {
             return;
         }
 
-        if (alreadyStoredType(typeName)) {
-            return;
-        }
+        Map<String, Type> types = findReferencedTypes(classDoc);
+        Map<String, Property> elements = findReferencedElements(types);
+        models.add(new Model(typeName, elements));
+        parseNestedModels(types.values());
+    }
 
-        Map<String, Type> fields = new HashMap<String, Type>();
+    private Map<String, Type> findReferencedTypes(ClassDoc classDoc) {
+        Map<String, Type> elements = new HashMap<String, Type>();
 
         //Get fields
         FieldDoc[] fieldDocs = classDoc.fields();
         if (fieldDocs != null && fieldDocs.length > 0) {
             for (FieldDoc field : fieldDocs) {
-                if (fields.get(field.name()) == null) {
-                    fields.put(field.name(), field.type());
+                if (elements.get(field.name()) == null) {
+                    elements.put(field.name(), field.type());
                 }
             }
         }
@@ -61,48 +59,46 @@ public class ApiModelParser {
                 if (method.name().startsWith("get") && method.name().length() > 3) {
                     String name = method.name().substring(3);
                     name = name.substring(0, 1).toLowerCase() + (name.length() > 1 ? name.substring(1) : "");
-                    if (fields.get(name) == null) {
-                        fields.put(name, method.returnType());
+                    if (elements.get(name) == null) {
+                        elements.put(name, method.returnType());
                     }
                 }
             }
         }
+        return elements;
+    }
 
-        //Process all fields & methods
-        if (fields.keySet().size() > 0) {
-            //Add to the model
-            Map<String, Property> fieldMap = new HashMap<String, Property>();
-            for (Map.Entry<String, Type> entry : fields.entrySet()) {
-                //Check if it is a collection and get collection type
-                String containerOf = null;
-                ParameterizedType pt = entry.getValue().asParameterizedType();
-                if (pt != null) {
-                    Type[] typeArgs = pt.typeArguments();
-                    if (typeArgs != null && typeArgs.length > 0) {
-                        containerOf = AnnotationHelper.typeOf(typeArgs[0]);
-                    }
-                }
+    private Map<String, Property> findReferencedElements(Map<String, Type> types) {
+        Map<String, Property> elements = new HashMap<String, Property>();
+        for (Map.Entry<String, Type> entry : types.entrySet()) {
+            Type containerOf = parseParameterisedTypeOf(entry.getValue());
+            String containerTypeOf = containerOf == null ? null : AnnotationHelper.typeIdOf(containerOf);
+            String eleTypeName = AnnotationHelper.typeIdOf(entry.getValue());
+            elements.put(entry.getKey(), new Property(eleTypeName, null, containerTypeOf));
+        }
+        return elements;
+    }
 
-                //Add to map
-                String eleTypeName = AnnotationHelper.typeOf(entry.getValue());
-                fieldMap.put(entry.getKey(), new Property(eleTypeName, null, containerOf));
-            }
-
-            models.add(new Model(typeName, fieldMap));
-
-            //Build contained models
-            for (Map.Entry<String, Type> entry : fields.entrySet()) {
-                //Check if it is a collection and get collection type
-                ParameterizedType pt = entry.getValue().asParameterizedType();
-                if (pt != null) {
-                    Type[] typeArgs = pt.typeArguments();
-                    if (typeArgs != null && typeArgs.length > 0) {
-                        findModels(typeArgs[0]);
-                    }
-                }
-                findModels(entry.getValue());
+    private void parseNestedModels(Collection<Type> types) {
+        for (Type type : types) {
+            parseModel(type);
+            Type pt = parseParameterisedTypeOf(type);
+            if (pt != null) {
+                parseModel(pt);
             }
         }
+    }
+
+    private Type parseParameterisedTypeOf(Type type) {
+        Type result = null;
+        ParameterizedType pt = type.asParameterizedType();
+        if (pt != null) {
+            Type[] typeArgs = pt.typeArguments();
+            if (typeArgs != null && typeArgs.length > 0) {
+                result = typeArgs[0];
+            }
+        }
+        return result;
     }
 
     private boolean alreadyStoredType(String typeName) {

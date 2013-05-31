@@ -26,15 +26,16 @@ public class JaxRsAnnotationParser {
         try {
             Collection<ApiDeclaration> declarations = new ArrayList<ApiDeclaration>();
             for (ClassDoc classDoc : rootDoc.classes()) {
-                Collection<Api> apis = new ApiClassParser(options, classDoc).parse();
+                ApiClassParser classParser = new ApiClassParser(options, classDoc);
+                Collection<Api> apis = classParser.parse();
                 if (apis.isEmpty()) {
                     continue;
                 }
 
-                // TODO retrieve models from Api class and pass along
                 // The idea behind this declaration is that "/foo" and "/foo/annotated" are stored in separate "Api" classes but are essentially the same APIs.
                 // ... "Api" class should actually include all API methods, but with paths.
-                declarations.add(new ApiDeclaration(options.getApiVersion(), options.getApiBasePath(), apis, Collections.<String, Model>emptyMap()));
+                // TODO (DL): models = classParser.models();
+                declarations.add(new ApiDeclaration(options.getApiVersion(), options.getApiBasePath(), apis, Collections.<Model>emptyList()));
             }
             writeApis(declarations);
             return true;

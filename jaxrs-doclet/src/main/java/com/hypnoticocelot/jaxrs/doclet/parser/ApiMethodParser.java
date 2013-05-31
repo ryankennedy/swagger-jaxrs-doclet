@@ -18,11 +18,13 @@ public class ApiMethodParser {
     private final DocletOptions options;
     private final String parentPath;
     private final MethodDoc methodDoc;
+    private final Set<Model> models;
 
     public ApiMethodParser(DocletOptions options, String parentPath, MethodDoc methodDoc) {
         this.options = options;
         this.parentPath = parentPath;
         this.methodDoc = methodDoc;
+        this.models = new LinkedHashSet<Model>();
     }
 
     public Method parse() {
@@ -32,7 +34,6 @@ public class ApiMethodParser {
         }
 
         String path = parentPath + firstNonNull(parsePath(methodDoc.annotations()), "");
-        Collection<Model> models = new LinkedHashSet<Model>();
 
         // parameters
         List<ApiParameter> parameters = new LinkedList<ApiParameter>();
@@ -47,14 +48,14 @@ public class ApiMethodParser {
                     AnnotationHelper.paramTypeOf(parameter),
                     AnnotationHelper.paramNameOf(parameter),
                     commentForParameter(methodDoc, parameter),
-                    AnnotationHelper.typeOf(parameter.type())
+                    AnnotationHelper.typeIdOf(parameter.type())
             ));
         }
 
         // return type
         Type type = methodDoc.returnType();
-        String returnType = AnnotationHelper.typeOf(type);
-        if (!type.simpleTypeName().equalsIgnoreCase("void") && options.isParseModels()) {
+        String returnType = AnnotationHelper.typeIdOf(type);
+        if (options.isParseModels()) {
             models.addAll(new ApiModelParser(type).parse());
         }
 
@@ -75,6 +76,10 @@ public class ApiMethodParser {
                 methodDoc.commentText().replace(firstSentences, ""),
                 returnType
         );
+    }
+
+    public Set<Model> models() {
+        return models;
     }
 
     private boolean shouldIncludeParameter(HttpMethod httpMethod, Parameter parameter) {

@@ -47,15 +47,13 @@ public class AnnotationHelper {
         return null;
     }
 
-    public static String typeOf(Type type) {
-        String name;
+    public static String typeIdOf(Type type) {
+        String name = null;
         ClassDoc cd = type.asClassDoc();
         if (cd != null) {
             name = getRootElementNameOf(cd);
-            if (name == null) {
-                name = typeOf(type.qualifiedTypeName());
-            }
-        } else {
+        }
+        if (name == null) {
             name = typeOf(type.qualifiedTypeName());
         }
         return name;

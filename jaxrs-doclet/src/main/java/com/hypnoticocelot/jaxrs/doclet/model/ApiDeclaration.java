@@ -1,7 +1,10 @@
 package com.hypnoticocelot.jaxrs.doclet.model;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
+
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ApiDeclaration {
@@ -14,11 +17,16 @@ public class ApiDeclaration {
     private ApiDeclaration() {
     }
 
-    public ApiDeclaration(String apiVersion, String basePath, Collection<Api> apis, Map<String, Model> models) {
+    public ApiDeclaration(String apiVersion, String basePath, Collection<Api> apis, Collection<Model> models) {
         this.apiVersion = apiVersion;
         this.basePath = basePath;
         this.apis = apis;
-        this.models = models;
+        this.models = new HashMap<String, Model>(Maps.uniqueIndex(models, new Function<Model, String>() {
+            @Override
+            public String apply(Model model) {
+                return model.getId();
+            }
+        }));
     }
 
     public String getApiVersion() {

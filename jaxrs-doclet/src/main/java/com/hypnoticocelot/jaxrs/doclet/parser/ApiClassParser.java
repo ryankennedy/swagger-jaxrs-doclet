@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
 import com.hypnoticocelot.jaxrs.doclet.model.Api;
 import com.hypnoticocelot.jaxrs.doclet.model.Method;
+import com.hypnoticocelot.jaxrs.doclet.model.Model;
 import com.hypnoticocelot.jaxrs.doclet.model.Operation;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.MethodDoc;
@@ -18,23 +19,26 @@ public class ApiClassParser {
     private final DocletOptions options;
     private final ClassDoc classDoc;
     private final String apiPath;
+    private final Set<Model> models;
 
     public ApiClassParser(DocletOptions options, ClassDoc classDoc) {
         this.options = options;
         this.classDoc = classDoc;
         this.apiPath = parsePath(classDoc.annotations());
+        this.models = new LinkedHashSet<Model>();
     }
 
     public Collection<Api> parse() {
         Map<String, Collection<Method>> apiMethods = new HashMap<String, Collection<Method>>();
 
         for (MethodDoc method : classDoc.methods()) {
-            Method parsedMethod = new ApiMethodParser(options, apiPath, method).parse();
+            ApiMethodParser methodParser = new ApiMethodParser(options, apiPath, method);
+            Method parsedMethod = methodParser.parse();
             if (parsedMethod == null) {
                 continue;
             }
+            models.addAll(methodParser.models());
 
-            // TODO (DL): model parsing could be done at this point with required parameters/return types
             String realPath = parsedMethod.getPath();
             Collection<Method> matchingMethods = apiMethods.get(realPath);
             if (matchingMethods == null) {
@@ -63,6 +67,10 @@ public class ApiClassParser {
             }
         });
         return apis;
+    }
+
+    public Collection<Model> models() {
+        return models;
     }
 
 }
