@@ -5,6 +5,7 @@ import com.hypnoticocelot.jaxrs.doclet.model.ApiParameter;
 import com.hypnoticocelot.jaxrs.doclet.model.HttpMethod;
 import com.hypnoticocelot.jaxrs.doclet.model.Method;
 import com.hypnoticocelot.jaxrs.doclet.model.Model;
+import com.hypnoticocelot.jaxrs.doclet.translator.Translator;
 import com.sun.javadoc.*;
 
 import java.util.*;

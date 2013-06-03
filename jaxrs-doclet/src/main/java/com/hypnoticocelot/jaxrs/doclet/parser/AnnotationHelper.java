@@ -4,6 +4,7 @@ import com.google.common.base.Predicate;
 import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.Parameter;
+import com.sun.javadoc.ProgramElementDoc;
 import com.sun.javadoc.Type;
 
 import java.util.ArrayList;
@@ -73,18 +74,37 @@ public class AnnotationHelper {
         return type;
     }
 
+    public static AnnotationDesc getAnnotation(ProgramElementDoc doc, String qualifiedAnnotationType) {
+        if (doc == null) {
+            return null;
+        }
+        return getAnnotation(doc.annotations(), qualifiedAnnotationType);
+    }
+
+    private static AnnotationDesc getAnnotation(AnnotationDesc[] annotations, String qualifiedAnnotationType) {
+        AnnotationDesc found = null;
+        for (AnnotationDesc annotation : annotations) {
+            try {
+                if (annotation.annotationType().qualifiedTypeName().equals(qualifiedAnnotationType)) {
+                    found = annotation;
+                    break;
+                }
+            } catch (RuntimeException e) {
+                System.err.println(annotation + " has invalid javadoc: " + e.getClass() + ": " + e.getMessage());
+            }
+        }
+        return found;
+    }
+
     /**
      * Determines the string representation of the parameter type.
      */
     public static String paramTypeOf(Parameter parameter) {
         AnnotationDesc[] annotations = parameter.annotations();
-        for (AnnotationDesc annotation : annotations) {
-            String annotationTypeName = annotation.annotationType().qualifiedTypeName();
-            if (annotationTypeName.equals(JAX_RS_PATH_PARAM)) {
-                return "path";
-            } else if (annotationTypeName.equals(JAX_RS_QUERY_PARAM)) {
-                return "query";
-            }
+        if (getAnnotation(annotations, JAX_RS_PATH_PARAM) != null) {
+            return "path";
+        } else if (getAnnotation(annotations, JAX_RS_QUERY_PARAM) != null) {
+            return "query";
         }
         return "body";
     }

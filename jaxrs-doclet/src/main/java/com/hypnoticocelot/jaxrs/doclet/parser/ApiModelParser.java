@@ -3,6 +3,7 @@ package com.hypnoticocelot.jaxrs.doclet.parser;
 import com.google.common.base.Predicate;
 import com.hypnoticocelot.jaxrs.doclet.model.Model;
 import com.hypnoticocelot.jaxrs.doclet.model.Property;
+import com.hypnoticocelot.jaxrs.doclet.translator.Translator;
 import com.sun.javadoc.*;
 
 import java.util.*;

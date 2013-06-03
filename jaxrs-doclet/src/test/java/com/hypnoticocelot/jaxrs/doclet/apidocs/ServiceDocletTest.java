@@ -7,7 +7,7 @@ import com.hypnoticocelot.jaxrs.doclet.Recorder;
 import com.hypnoticocelot.jaxrs.doclet.model.ApiDeclaration;
 import com.hypnoticocelot.jaxrs.doclet.model.ResourceListing;
 import com.hypnoticocelot.jaxrs.doclet.parser.JaxRsAnnotationParser;
-import com.hypnoticocelot.jaxrs.doclet.parser.SimpleTranslator;
+import com.hypnoticocelot.jaxrs.doclet.translator.SimpleTranslator;
 import com.sun.javadoc.RootDoc;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.ListBuffer;

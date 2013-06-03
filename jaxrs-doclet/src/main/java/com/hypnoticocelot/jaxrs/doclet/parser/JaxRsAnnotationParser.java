@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
 import com.hypnoticocelot.jaxrs.doclet.ServiceDoclet;
 import com.hypnoticocelot.jaxrs.doclet.model.*;
+import com.hypnoticocelot.jaxrs.doclet.translator.Translator;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.RootDoc;
 

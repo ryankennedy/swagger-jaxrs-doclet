@@ -1,4 +1,4 @@
-package com.hypnoticocelot.jaxrs.doclet.parser;
+package com.hypnoticocelot.jaxrs.doclet.translator;
 
 import com.sun.javadoc.FieldDoc;
 import com.sun.javadoc.MethodDoc;
