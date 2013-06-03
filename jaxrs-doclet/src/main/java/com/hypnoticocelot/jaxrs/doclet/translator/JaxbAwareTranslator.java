@@ -39,9 +39,11 @@ public class JaxbAwareTranslator implements Translator {
 
         String name = jaxbNameFor(JAXB_XML_ROOT_ELEMENT, type.asClassDoc());
         if (name != null) {
-            while (reverseIndex.containsKey(name)) {
-                name += '_';
+            StringBuilder nameBuilder = new StringBuilder(name);
+            while (reverseIndex.containsKey(nameBuilder.toString())) {
+                nameBuilder.append('_');
             }
+            name = nameBuilder.toString();
         }
         name = firstNonNull(name, simpleTranslator.nameFor(type));
         namedTypes.put(type, name);
