@@ -1,18 +1,23 @@
 package com.hypnoticocelot.jaxrs.doclet.parser;
 
 import com.sun.javadoc.AnnotationDesc;
+import com.sun.javadoc.Parameter;
 import com.sun.javadoc.ProgramElementDoc;
 
 public class AnnotationParser {
 
-    private final ProgramElementDoc element;
+    private final AnnotationDesc[] annotations;
 
     public AnnotationParser(ProgramElementDoc element) {
-        this.element = element;
+        annotations = element.annotations();
+    }
+
+    public AnnotationParser(Parameter parameter) {
+        annotations = parameter.annotations();
     }
 
     public String getAnnotationValue(String qualifiedAnnotationType, String key) {
-        AnnotationDesc annotation = AnnotationHelper.getAnnotation(element, qualifiedAnnotationType);
+        AnnotationDesc annotation = getAnnotation(qualifiedAnnotationType);
         if (annotation == null) {
             return null;
         }
@@ -25,7 +30,22 @@ public class AnnotationParser {
     }
 
     public boolean isAnnotatedBy(String qualifiedAnnotationType) {
-        return AnnotationHelper.getAnnotation(element, qualifiedAnnotationType) != null;
+        return getAnnotation(qualifiedAnnotationType) != null;
+    }
+
+    private AnnotationDesc getAnnotation(String qualifiedAnnotationType) {
+        AnnotationDesc found = null;
+        for (AnnotationDesc annotation : annotations) {
+            try {
+                if (annotation.annotationType().qualifiedTypeName().equals(qualifiedAnnotationType)) {
+                    found = annotation;
+                    break;
+                }
+            } catch (RuntimeException e) {
+                System.err.println(annotation + " has invalid javadoc: " + e.getClass() + ": " + e.getMessage());
+            }
+        }
+        return found;
     }
 
 }
