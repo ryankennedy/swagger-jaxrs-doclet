@@ -1,5 +1,6 @@
 package com.hypnoticocelot.jaxrs.doclet.parser;
 
+import com.google.common.base.Function;
 import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
 import com.hypnoticocelot.jaxrs.doclet.ServiceDoclet;
 import com.hypnoticocelot.jaxrs.doclet.model.*;
@@ -12,12 +13,16 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static com.google.common.collect.Maps.uniqueIndex;
+
 public class JaxRsAnnotationParser {
 
+    private final Translator translator;
     private final DocletOptions options;
     private final RootDoc rootDoc;
 
-    public JaxRsAnnotationParser(DocletOptions options, RootDoc rootDoc) {
+    public JaxRsAnnotationParser(Translator translator, DocletOptions options, RootDoc rootDoc) {
+        this.translator = translator;
         this.options = options;
         this.rootDoc = rootDoc;
     }
@@ -26,7 +31,7 @@ public class JaxRsAnnotationParser {
         try {
             Collection<ApiDeclaration> declarations = new ArrayList<ApiDeclaration>();
             for (ClassDoc classDoc : rootDoc.classes()) {
-                ApiClassParser classParser = new ApiClassParser(options, classDoc);
+                ApiClassParser classParser = new ApiClassParser(translator, options, classDoc);
                 Collection<Api> apis = classParser.parse();
                 if (apis.isEmpty()) {
                     continue;
@@ -34,8 +39,13 @@ public class JaxRsAnnotationParser {
 
                 // The idea behind this declaration is that "/foo" and "/foo/annotated" are stored in separate "Api" classes but are essentially the same APIs.
                 // ... "Api" class should actually include all API methods, but with paths.
-                // TODO (DL): models = classParser.models();
-                declarations.add(new ApiDeclaration(options.getApiVersion(), options.getApiBasePath(), apis, Collections.<Model>emptyList()));
+                Map<String, Model> models = uniqueIndex(classParser.models(), new Function<Model, String>() {
+                    @Override
+                    public String apply(Model model) {
+                        return model.getId();
+                    }
+                });
+                declarations.add(new ApiDeclaration(options.getApiVersion(), options.getApiBasePath(), apis, models));
             }
             writeApis(declarations);
             return true;

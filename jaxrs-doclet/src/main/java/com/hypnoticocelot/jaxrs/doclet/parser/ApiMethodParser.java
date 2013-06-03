@@ -15,12 +15,14 @@ import static com.hypnoticocelot.jaxrs.doclet.parser.AnnotationHelper.parsePath;
 
 public class ApiMethodParser {
 
+    private final Translator translator;
     private final DocletOptions options;
     private final String parentPath;
     private final MethodDoc methodDoc;
     private final Set<Model> models;
 
-    public ApiMethodParser(DocletOptions options, String parentPath, MethodDoc methodDoc) {
+    public ApiMethodParser(Translator translator, DocletOptions options, String parentPath, MethodDoc methodDoc) {
+        this.translator = translator;
         this.options = options;
         this.parentPath = parentPath;
         this.methodDoc = methodDoc;
@@ -42,21 +44,21 @@ public class ApiMethodParser {
                 continue;
             }
             if (options.isParseModels()) {
-                models.addAll(new ApiModelParser(parameter.type()).parse());
+                models.addAll(new ApiModelParser(translator, parameter.type()).parse());
             }
             parameters.add(new ApiParameter(
                     AnnotationHelper.paramTypeOf(parameter),
                     AnnotationHelper.paramNameOf(parameter),
                     commentForParameter(methodDoc, parameter),
-                    AnnotationHelper.typeIdOf(parameter.type())
+                    translator.nameFor(parameter.type())
             ));
         }
 
         // return type
         Type type = methodDoc.returnType();
-        String returnType = AnnotationHelper.typeIdOf(type);
+        String returnType = translator.nameFor(type);
         if (options.isParseModels()) {
-            models.addAll(new ApiModelParser(type).parse());
+            models.addAll(new ApiModelParser(translator, type).parse());
         }
 
         // First Sentence of Javadoc method description

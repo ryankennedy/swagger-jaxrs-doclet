@@ -7,6 +7,7 @@ import com.hypnoticocelot.jaxrs.doclet.Recorder;
 import com.hypnoticocelot.jaxrs.doclet.model.ApiDeclaration;
 import com.hypnoticocelot.jaxrs.doclet.model.ResourceListing;
 import com.hypnoticocelot.jaxrs.doclet.parser.JaxRsAnnotationParser;
+import com.hypnoticocelot.jaxrs.doclet.parser.SimpleTranslator;
 import com.sun.javadoc.RootDoc;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.ListBuffer;
@@ -52,7 +53,7 @@ public class ServiceDocletTest {
         final TestRecorder recorder = new TestRecorder();
         DocletOptions options = DocletOptions.parse(rootDoc.options());
         options.setRecorder(recorder);
-        assertTrue("ServiceDoclet failed", new JaxRsAnnotationParser(options, rootDoc).run());
+        assertTrue("ServiceDoclet failed", new JaxRsAnnotationParser(new SimpleTranslator(), options, rootDoc).run());
 
         final ResourceListing expectedListing = mapper.readValue(getClass().getResourceAsStream("/fixtures/sample/service.json"), ResourceListing.class);
         assertThat(recorder.getListing(new File("service.json")), equalTo(expectedListing));

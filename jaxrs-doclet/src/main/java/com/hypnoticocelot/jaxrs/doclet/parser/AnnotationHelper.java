@@ -3,7 +3,6 @@ package com.hypnoticocelot.jaxrs.doclet.parser;
 import com.google.common.base.Predicate;
 import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
 import com.sun.javadoc.AnnotationDesc;
-import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.Parameter;
 import com.sun.javadoc.Type;
 
@@ -14,7 +13,6 @@ public class AnnotationHelper {
 
     private static final String JAX_RS_ANNOTATION_PACKAGE = "javax.ws.rs";
     private static final String JAX_RS_PATH = "javax.ws.rs.Path";
-    private static final String XML_ROOT_ELEMENT = "javax.xml.bind.annotation.XmlRootElement";
     private static final String JAX_RS_PATH_PARAM = "javax.ws.rs.PathParam";
     private static final String JAX_RS_QUERY_PARAM = "javax.ws.rs.QueryParam";
 
@@ -47,18 +45,6 @@ public class AnnotationHelper {
         return null;
     }
 
-    public static String typeIdOf(Type type) {
-        String name = null;
-        ClassDoc cd = type.asClassDoc();
-        if (cd != null) {
-            name = getRootElementNameOf(cd);
-        }
-        if (name == null) {
-            name = typeOf(type.qualifiedTypeName());
-        }
-        return name;
-    }
-
     /**
      * Determines the String representation of the object Type.
      */
@@ -85,27 +71,6 @@ public class AnnotationHelper {
             type = "List";
         }
         return type;
-    }
-
-    /**
-     * Determines the XmlRootElement name. Returns null if no name found.
-     */
-    private static String getRootElementNameOf(ClassDoc classDoc) {
-        AnnotationDesc[] annotations = classDoc.annotations();
-        for (AnnotationDesc annotation : annotations) {
-            String annotationTypeName = annotation.annotationType().qualifiedTypeName();
-            if (annotationTypeName.equals(XML_ROOT_ELEMENT)) {
-                AnnotationDesc.ElementValuePair[] evpArr = annotation.elementValues();
-                if (evpArr.length > 0) {
-                    for (AnnotationDesc.ElementValuePair evp : evpArr) {
-                        if (evp.element().name().equals("name")) {
-                            return evp.value().value().toString();
-                        }
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     /**
@@ -143,6 +108,10 @@ public class AnnotationHelper {
             }
         }
         return parameter.name();
+    }
+
+    public static boolean isPrimitive(Type type) {
+        return PRIMITIVES.contains(typeOf(type.qualifiedTypeName()));
     }
 
     public static class ExcludedAnnotations implements Predicate<AnnotationDesc> {

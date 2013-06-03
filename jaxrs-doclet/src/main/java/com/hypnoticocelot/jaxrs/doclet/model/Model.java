@@ -1,5 +1,7 @@
 package com.hypnoticocelot.jaxrs.doclet.model;
 
+import com.google.common.base.Objects;
+
 import java.util.Map;
 
 public class Model {
@@ -27,27 +29,21 @@ public class Model {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
-        Model model = (Model) o;
-
-        if (id != null ? !id.equals(model.id) : model.id != null) return false;
-        if (properties != null ? !properties.equals(model.properties) : model.properties != null) return false;
-
-        return true;
+        Model other = (Model) o;
+        return Objects.equal(id, other.id)
+                && Objects.equal(properties, other.properties);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (properties != null ? properties.hashCode() : 0);
-        return result;
+        return Objects.hashCode(id, properties);
     }
 
     @Override
     public String toString() {
-        return "Model{" +
-                "id='" + id + '\'' +
-                ", properties=" + properties +
-                '}';
+        return Objects.toStringHelper(this)
+                .add("id", id)
+                .add("properties", properties)
+                .toString();
     }
 }
