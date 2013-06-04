@@ -1,0 +1,31 @@
+{
+    "apiVersion": "0",
+    "swaggerVersion": "1.1",
+    "basePath": "http://localhost:8080",
+    "resourcePath": "/primitives/booleans",
+    "apis": [
+        {
+            "path": "/primitives/booleans",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "nickname": "get",
+                    "responseClass": "boolean"
+                },
+                {
+                    "httpMethod": "POST",
+                    "nickname": "create",
+                    "responseClass": "Response",
+                    "parameters": [
+                        {
+                            "paramType": "body",
+                            "name": "value",
+                            "dataType": "boolean"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
