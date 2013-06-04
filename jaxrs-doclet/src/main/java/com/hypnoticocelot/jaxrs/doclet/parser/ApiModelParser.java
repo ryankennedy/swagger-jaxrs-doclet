@@ -38,7 +38,7 @@ public class ApiModelParser {
         Map<String, Type> types = findReferencedTypes(classDoc);
         Map<String, Property> elements = findReferencedElements(types);
         if (!elements.isEmpty()) {
-            models.add(new Model(translator.nameFor(type), elements));
+            models.add(new Model(translator.typeName(type).value(), elements));
             parseNestedModels(types.values());
         }
     }
@@ -49,7 +49,7 @@ public class ApiModelParser {
         FieldDoc[] fieldDocs = classDoc.fields();
         if (fieldDocs != null) {
             for (FieldDoc field : fieldDocs) {
-                String name = translator.nameFor(field);
+                String name = translator.fieldName(field).value();
                 if (name != null && !elements.containsKey(name)) {
                     elements.put(name, field.type());
                 }
@@ -59,7 +59,7 @@ public class ApiModelParser {
         MethodDoc[] methodDocs = classDoc.methods();
         if (methodDocs != null) {
             for (MethodDoc method : methodDocs) {
-                String name = translator.nameFor(method);
+                String name = translator.methodName(method).value();
                 if (name != null && !elements.containsKey(name)) {
                     elements.put(name, method.returnType());
                 }
@@ -76,9 +76,9 @@ public class ApiModelParser {
             ClassDoc typeClassDoc = type.asClassDoc();
 
             Type containerOf = parseParameterisedTypeOf(type);
-            String containerTypeOf = containerOf == null ? null : translator.nameFor(containerOf);
+            String containerTypeOf = containerOf == null ? null : translator.typeName(containerOf).value();
 
-            String propertyName = translator.nameFor(type);
+            String propertyName = translator.typeName(type).value();
             Property property;
             if (typeClassDoc != null && typeClassDoc.isEnum()) {
                 property = new Property(typeClassDoc.enumConstants(), null);
@@ -116,7 +116,7 @@ public class ApiModelParser {
         return filter(models, new Predicate<Model>() {
             @Override
             public boolean apply(Model model) {
-                return model.getId().equals(translator.nameFor(type));
+                return model.getId().equals(translator.typeName(type).value());
             }
         }).size() > 0;
     }

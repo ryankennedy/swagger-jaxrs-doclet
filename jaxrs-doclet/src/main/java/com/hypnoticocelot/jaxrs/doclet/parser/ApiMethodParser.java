@@ -51,13 +51,13 @@ public class ApiMethodParser {
                     AnnotationHelper.paramTypeOf(parameter),
                     AnnotationHelper.paramNameOf(parameter),
                     commentForParameter(methodDoc, parameter),
-                    translator.nameFor(parameter.type())
+                    translator.typeName(parameter.type()).value()
             ));
         }
 
         // return type
         Type type = methodDoc.returnType();
-        String returnType = translator.nameFor(type);
+        String returnType = translator.typeName(type).value();
         if (options.isParseModels()) {
             models.addAll(new ApiModelParser(translator, type).parse());
         }

@@ -10,22 +10,25 @@ import com.sun.javadoc.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.hypnoticocelot.jaxrs.doclet.translator.Translator.OptionalName.ignored;
+import static com.hypnoticocelot.jaxrs.doclet.translator.Translator.OptionalName.presentOrMissing;
+
 public class JaxbAwareTranslator implements Translator {
 
     private static final String JAXB_XML_ROOT_ELEMENT = "javax.xml.bind.annotation.XmlRootElement";
     private static final String JAXB_XML_ELEMENT = "javax.xml.bind.annotation.XmlElement";
     private static final String JAXB_XML_TRANSIENT = "javax.xml.bind.annotation.XmlTransient";
 
-    private final Map<String, Type> reverseIndex;
-    private final Map<Type, String> namedTypes;
+    private final Map<OptionalName, Type> reverseIndex;
+    private final Map<Type, OptionalName> namedTypes;
 
     public JaxbAwareTranslator() {
-        reverseIndex = new HashMap<String, Type>();
-        namedTypes = new HashMap<Type, String>();
+        reverseIndex = new HashMap<OptionalName, Type>();
+        namedTypes = new HashMap<Type, OptionalName>();
     }
 
     @Override
-    public String nameFor(Type type) {
+    public OptionalName typeName(Type type) {
         if (namedTypes.containsKey(type)) {
             return namedTypes.get(type);
         }
@@ -33,13 +36,13 @@ public class JaxbAwareTranslator implements Translator {
             return null;
         }
 
-        String name = jaxbNameFor(JAXB_XML_ROOT_ELEMENT, type.asClassDoc());
-        if (name != null) {
-            StringBuilder nameBuilder = new StringBuilder(name);
-            while (reverseIndex.containsKey(nameBuilder.toString())) {
+        OptionalName name = nameFor(JAXB_XML_ROOT_ELEMENT, type.asClassDoc());
+        if (name.isPresent()) {
+            StringBuilder nameBuilder = new StringBuilder(name.value());
+            while (reverseIndex.containsKey(name)) {
                 nameBuilder.append('_');
+                name = presentOrMissing(nameBuilder.toString());
             }
-            name = nameBuilder.toString();
             namedTypes.put(type, name);
             reverseIndex.put(name, type);
         }
@@ -47,21 +50,21 @@ public class JaxbAwareTranslator implements Translator {
     }
 
     @Override
-    public String nameFor(FieldDoc field) {
-        return jaxbNameFor(JAXB_XML_ELEMENT, field);
+    public OptionalName fieldName(FieldDoc field) {
+        return nameFor(JAXB_XML_ELEMENT, field);
     }
 
     @Override
-    public String nameFor(MethodDoc method) {
-        return jaxbNameFor(JAXB_XML_ELEMENT, method);
+    public OptionalName methodName(MethodDoc method) {
+        return nameFor(JAXB_XML_ELEMENT, method);
     }
 
-    private String jaxbNameFor(String annotation, ProgramElementDoc doc) {
+    private OptionalName nameFor(String annotation, ProgramElementDoc doc) {
         AnnotationParser element = new AnnotationParser(doc);
         if (element.isAnnotatedBy(JAXB_XML_TRANSIENT)) {
-            return null;
+            return ignored();
         }
-        return element.getAnnotationValue(annotation, "name");
+        return presentOrMissing(element.getAnnotationValue(annotation, "name"));
     }
 
 }

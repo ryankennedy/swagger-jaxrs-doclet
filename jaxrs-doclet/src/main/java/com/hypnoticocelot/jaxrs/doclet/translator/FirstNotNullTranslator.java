@@ -23,39 +23,39 @@ public class FirstNotNullTranslator implements Translator {
     }
 
     @Override
-    public String nameFor(final Type type) {
-        return firstNotNullOf(new Function<Translator, String>() {
+    public OptionalName typeName(final Type type) {
+        return firstNotNullOf(new Function<Translator, OptionalName>() {
             @Override
-            public String apply(Translator translator) {
-                return translator.nameFor(type);
+            public OptionalName apply(Translator translator) {
+                return translator.typeName(type);
             }
         });
     }
 
     @Override
-    public String nameFor(final FieldDoc field) {
-        return firstNotNullOf(new Function<Translator, String>() {
+    public OptionalName fieldName(final FieldDoc field) {
+        return firstNotNullOf(new Function<Translator, OptionalName>() {
             @Override
-            public String apply(Translator translator) {
-                return translator.nameFor(field);
+            public OptionalName apply(Translator translator) {
+                return translator.fieldName(field);
             }
         });
     }
 
     @Override
-    public String nameFor(final MethodDoc method) {
-        return firstNotNullOf(new Function<Translator, String>() {
+    public OptionalName methodName(final MethodDoc method) {
+        return firstNotNullOf(new Function<Translator, OptionalName>() {
             @Override
-            public String apply(Translator translator) {
-                return translator.nameFor(method);
+            public OptionalName apply(Translator translator) {
+                return translator.methodName(method);
             }
         });
     }
 
-    private String firstNotNullOf(Function<Translator, String> function) {
-        String name = null;
+    private OptionalName firstNotNullOf(Function<Translator, OptionalName> function) {
+        OptionalName name = null;
         Iterator<Translator> iterator = chain.iterator();
-        while (name == null && iterator.hasNext()) {
+        while ((name == null || name.isMissing()) && iterator.hasNext()) {
             name = function.apply(iterator.next());
         }
         return name;
