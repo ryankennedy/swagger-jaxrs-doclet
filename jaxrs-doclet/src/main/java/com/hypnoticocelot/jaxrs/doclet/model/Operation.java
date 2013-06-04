@@ -24,7 +24,7 @@ public class Operation {
         this.httpMethod = method.getMethod();
         this.nickname = emptyToNull(method.getMethodName());
         this.responseClass = emptyToNull(AnnotationHelper.typeOf(method.getReturnType()));
-        this.parameters = method.getParameters() == null ? null : method.getParameters();
+        this.parameters = method.getParameters().isEmpty() ? null : method.getParameters();
         this.summary = emptyToNull(method.getFirstSentence());
         this.notes = emptyToNull(method.getComment());
     }

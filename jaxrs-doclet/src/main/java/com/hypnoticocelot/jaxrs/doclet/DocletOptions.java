@@ -21,7 +21,7 @@ public class DocletOptions {
     private Recorder recorder = new ObjectMapperRecorder();
     private Translator translator;
 
-    private DocletOptions() {
+    public DocletOptions() {
         excludeAnnotationClasses = new ArrayList<String>();
         excludeAnnotationClasses.add("javax.ws.rs.HeaderParam");
         excludeAnnotationClasses.add("javax.ws.rs.core.Context");
@@ -29,6 +29,27 @@ public class DocletOptions {
                 .addNext(new JacksonAwareTranslator())
                 .addNext(new JaxbAwareTranslator())
                 .addNext(new NameBasedTranslator());
+    }
+
+    public static DocletOptions parse(String[][] options) {
+        DocletOptions parsedOptions = new DocletOptions();
+        for (String[] option : options) {
+            if (option[0].equals("-d")) {
+                parsedOptions.outputDirectory = new File(option[1]);
+                checkArgument(parsedOptions.outputDirectory.isDirectory(), "Path after -d is expected to be a directory!");
+            } else if (option[0].equals("-docBasePath")) {
+                parsedOptions.docBasePath = option[1];
+            } else if (option[0].equals("-apiBasePath")) {
+                parsedOptions.apiBasePath = option[1];
+            } else if (option[0].equals("-apiVersion")) {
+                parsedOptions.apiVersion = option[1];
+            } else if (option[0].equals("-excludeAnnotationClasses")) {
+                parsedOptions.excludeAnnotationClasses.addAll(asList(copyOfRange(option, 1, option.length)));
+            } else if (option[0].equals("-disableModels")) {
+                parsedOptions.parseModels = false;
+            }
+        }
+        return parsedOptions;
     }
 
     public File getOutputDirectory() {
@@ -59,37 +80,18 @@ public class DocletOptions {
         return recorder;
     }
 
-    public void setRecorder(Recorder recorder) {
+    public DocletOptions setRecorder(Recorder recorder) {
         this.recorder = recorder;
+        return this;
     }
 
     public Translator getTranslator() {
         return translator;
     }
 
-    public void setTranslator(Translator translator) {
+    public DocletOptions setTranslator(Translator translator) {
         this.translator = translator;
-    }
-
-    public static DocletOptions parse(String[][] options) {
-        DocletOptions parsedOptions = new DocletOptions();
-        for (String[] option : options) {
-            if (option[0].equals("-d")) {
-                parsedOptions.outputDirectory = new File(option[1]);
-                checkArgument(parsedOptions.outputDirectory.isDirectory(), "Path after -d is expected to be a directory!");
-            } else if (option[0].equals("-docBasePath")) {
-                parsedOptions.docBasePath = option[1];
-            } else if (option[0].equals("-apiBasePath")) {
-                parsedOptions.apiBasePath = option[1];
-            } else if (option[0].equals("-apiVersion")) {
-                parsedOptions.apiVersion = option[1];
-            } else if (option[0].equals("-excludeAnnotationClasses")) {
-                parsedOptions.excludeAnnotationClasses.addAll(asList(copyOfRange(option, 1, option.length)));
-            } else if (option[0].equals("-disableModels")) {
-                parsedOptions.parseModels = false;
-            }
-        }
-        return parsedOptions;
+        return this;
     }
 
 }
