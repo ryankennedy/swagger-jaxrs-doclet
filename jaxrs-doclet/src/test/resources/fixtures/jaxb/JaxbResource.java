@@ -3,6 +3,7 @@ package fixtures.jaxb;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 
 @Path("/jaxb")
 public class JaxbResource {
@@ -12,7 +13,7 @@ public class JaxbResource {
     }
 
     @POST
-    public javax.xml.ws.Response create(PayloadModel payload) {
-        return new ResponseModel();
+    public Response create(PayloadModel payload) {
+        return Response.ok().build();
     }
 }
