@@ -5,7 +5,7 @@ import com.sun.javadoc.FieldDoc;
 import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.Type;
 
-public class SimpleTranslator implements Translator {
+public class NameBasedTranslator implements Translator {
 
     @Override
     public String nameFor(Type type) {

@@ -10,16 +10,16 @@ import com.sun.javadoc.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JaxbAwareTranslator implements Translator {
+public class JacksonAwareTranslator implements Translator {
 
-    private static final String JAXB_XML_ROOT_ELEMENT = "javax.xml.bind.annotation.XmlRootElement";
-    private static final String JAXB_XML_ELEMENT = "javax.xml.bind.annotation.XmlElement";
-    private static final String JAXB_XML_TRANSIENT = "javax.xml.bind.annotation.XmlTransient";
+    private static final String JSON_ROOT = "com.fasterxml.jackson.annotation.JsonRootName";
+    private static final String JSON_ELEMENT = "com.fasterxml.jackson.annotation.JsonProperty";
+    private static final String JSON_IGNORE = "com.fasterxml.jackson.annotation.JsonIgnore";
 
     private final Map<String, Type> reverseIndex;
     private final Map<Type, String> namedTypes;
 
-    public JaxbAwareTranslator() {
+    public JacksonAwareTranslator() {
         reverseIndex = new HashMap<String, Type>();
         namedTypes = new HashMap<Type, String>();
     }
@@ -33,7 +33,7 @@ public class JaxbAwareTranslator implements Translator {
             return namedTypes.get(type);
         }
 
-        String name = jaxbNameFor(JAXB_XML_ROOT_ELEMENT, type.asClassDoc());
+        String name = jacksonNameFor(JSON_ROOT, type.asClassDoc());
         if (name != null) {
             StringBuilder nameBuilder = new StringBuilder(name);
             while (reverseIndex.containsKey(nameBuilder.toString())) {
@@ -48,17 +48,17 @@ public class JaxbAwareTranslator implements Translator {
 
     @Override
     public String nameFor(FieldDoc field) {
-        return jaxbNameFor(JAXB_XML_ELEMENT, field);
+        return jacksonNameFor(JSON_ELEMENT, field);
     }
 
     @Override
     public String nameFor(MethodDoc method) {
-        return jaxbNameFor(JAXB_XML_ELEMENT, method);
+        return jacksonNameFor(JSON_ELEMENT, method);
     }
 
-    private String jaxbNameFor(String annotation, ProgramElementDoc doc) {
+    private String jacksonNameFor(String annotation, ProgramElementDoc doc) {
         AnnotationParser element = new AnnotationParser(doc);
-        if (element.isAnnotatedBy(JAXB_XML_TRANSIENT)) {
+        if (element.isAnnotatedBy(JSON_IGNORE)) {
             return null;
         }
         return element.getAnnotationValue(annotation, "name");
