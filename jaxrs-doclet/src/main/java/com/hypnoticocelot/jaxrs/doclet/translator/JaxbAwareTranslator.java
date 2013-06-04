@@ -26,11 +26,11 @@ public class JaxbAwareTranslator implements Translator {
 
     @Override
     public String nameFor(Type type) {
-        if (AnnotationHelper.isPrimitive(type)) {
-            return AnnotationHelper.typeOf(type.qualifiedTypeName());
-        }
         if (namedTypes.containsKey(type)) {
             return namedTypes.get(type);
+        }
+        if (AnnotationHelper.isPrimitive(type) || type.asClassDoc() == null) {
+            return null;
         }
 
         String name = jaxbNameFor(JAXB_XML_ROOT_ELEMENT, type.asClassDoc());
