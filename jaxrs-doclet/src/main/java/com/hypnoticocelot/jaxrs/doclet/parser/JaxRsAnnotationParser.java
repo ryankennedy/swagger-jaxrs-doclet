@@ -2,6 +2,7 @@ package com.hypnoticocelot.jaxrs.doclet.parser;
 
 import com.google.common.base.Function;
 import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
+import com.hypnoticocelot.jaxrs.doclet.Recorder;
 import com.hypnoticocelot.jaxrs.doclet.ServiceDoclet;
 import com.hypnoticocelot.jaxrs.doclet.model.*;
 import com.sun.javadoc.ClassDoc;
@@ -56,28 +57,31 @@ public class JaxRsAnnotationParser {
 
     private void writeApis(Collection<ApiDeclaration> apis) throws IOException {
         List<ResourceListingAPI> resources = new LinkedList<ResourceListingAPI>();
+        File outputDirectory = options.getOutputDirectory();
+        Recorder recorder = options.getRecorder();
+
         for (ApiDeclaration api : apis) {
             resources.add(new ResourceListingAPI(api.getResourcePath() + ".{format}", ""));
-            File apiFile = new File(options.getOutput(), api.getResourcePath().replaceFirst("/", "") + ".json");
-            options.getRecorder().record(apiFile, api);
+            File apiFile = new File(outputDirectory, api.getResourcePath().replaceFirst("/", "") + ".json");
+            recorder.record(apiFile, api);
         }
 
         //write out json for api
         ResourceListing listing = new ResourceListing(options.getApiVersion(), options.getDocBasePath(), resources);
-        File docFile = new File(options.getOutput(), "service.json");
-        options.getRecorder().record(docFile, listing);
+        File docFile = new File(outputDirectory, "service.json");
+        recorder.record(docFile, listing);
 
         // Copy swagger-ui into the output directory.
         final ZipInputStream swaggerZip = new ZipInputStream(ServiceDoclet.class.getResourceAsStream("/swagger-ui.zip"));
         ZipEntry entry = swaggerZip.getNextEntry();
         while (entry != null) {
-            final File swaggerFile = new File(options.getOutput(), entry.getName());
+            final File swaggerFile = new File(outputDirectory, entry.getName());
             if (entry.isDirectory()) {
                 if (!swaggerFile.isDirectory() && !swaggerFile.mkdirs()) {
                     throw new RuntimeException("Unable to create directory: " + swaggerFile);
                 }
             } else {
-                options.getRecorder().record(swaggerFile, swaggerZip);
+                recorder.record(swaggerFile, swaggerZip);
             }
 
             entry = swaggerZip.getNextEntry();

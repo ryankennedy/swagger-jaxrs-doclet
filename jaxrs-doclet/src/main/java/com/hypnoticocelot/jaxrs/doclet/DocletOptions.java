@@ -6,12 +6,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.copyOfRange;
 
 public class DocletOptions {
 
-    private File output;
+    private File outputDirectory;
     private String docBasePath = "http://localhost:8080";
     private String apiBasePath = "http://localhost:8080";
     private String apiVersion = "0";
@@ -30,8 +31,8 @@ public class DocletOptions {
                 .addNext(new NameBasedTranslator());
     }
 
-    public File getOutput() {
-        return output;
+    public File getOutputDirectory() {
+        return outputDirectory;
     }
 
     public String getDocBasePath() {
@@ -74,7 +75,8 @@ public class DocletOptions {
         DocletOptions parsedOptions = new DocletOptions();
         for (String[] option : options) {
             if (option[0].equals("-d")) {
-                parsedOptions.output = new File(option[1]);
+                parsedOptions.outputDirectory = new File(option[1]);
+                checkArgument(parsedOptions.outputDirectory.isDirectory(), "Path after -d is expected to be a directory!");
             } else if (option[0].equals("-docBasePath")) {
                 parsedOptions.docBasePath = option[1];
             } else if (option[0].equals("-apiBasePath")) {
