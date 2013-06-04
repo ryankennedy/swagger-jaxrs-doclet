@@ -36,8 +36,6 @@ public class JaxRsAnnotationParser {
                     continue;
                 }
 
-                // The idea behind this declaration is that "/foo" and "/foo/annotated" are stored in separate "Api" classes but are essentially the same APIs.
-                // ... "Api" class should actually include all API methods, but with paths.
                 Map<String, Model> models = uniqueIndex(classParser.models(), new Function<Model, String>() {
                     @Override
                     public String apply(Model model) {
@@ -46,6 +44,9 @@ public class JaxRsAnnotationParser {
                 });
                 String apiPath = apis.iterator().next().getPath();
                 String rootPath = "/" + (apiPath.startsWith("/") ? apiPath.replaceFirst("/", "") : apiPath).replaceAll("/", "_").replaceAll("(\\{|\\})", "");
+
+                // The idea (and need) for the declaration is that "/foo" and "/foo/annotated" are stored in separate
+                // Api classes but are part of the same resource.
                 declarations.add(new ApiDeclaration(options.getApiVersion(), options.getApiBasePath(), rootPath, apis, models));
             }
             writeApis(declarations);
