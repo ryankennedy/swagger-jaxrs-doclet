@@ -1,0 +1,55 @@
+{
+    "apiVersion": "0",
+    "swaggerVersion": "1.1",
+    "basePath": "http://localhost:8080",
+    "resourcePath": "/jaxb",
+    "apis": [
+        {
+            "path": "/jaxb",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "nickname": "get",
+                    "responseClass": "response"
+                },
+                {
+                    "httpMethod": "POST",
+                    "nickname": "create",
+                    "responseClass": "Response",
+                    "parameters": [
+                        {
+                            "paramType": "body",
+                            "name": "payload",
+                            "dataType": "payload"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "models": {
+        "response": {
+            "id": "response",
+            "properties": {
+                "visibleField": {
+                    "type": "string"
+                },
+                "odd-name": {
+                    "type": "string"
+                }
+            }
+        },
+        "payload": {
+            "id": "payload",
+            "properties": {
+                "visibleField": {
+                    "type": "string"
+                },
+                "odd-name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
