@@ -1,5 +1,7 @@
 package com.hypnoticocelot.jaxrs.doclet.model;
 
+import com.google.common.base.Objects;
+
 public class ResourceListingAPI {
     private String path;
     private String description;
@@ -25,27 +27,21 @@ public class ResourceListingAPI {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         ResourceListingAPI that = (ResourceListingAPI) o;
-
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (path != null ? !path.equals(that.path) : that.path != null) return false;
-
-        return true;
+        return Objects.equal(path, that.path)
+                && Objects.equal(description, that.description);
     }
 
     @Override
     public int hashCode() {
-        int result = path != null ? path.hashCode() : 0;
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        return result;
+        return Objects.hashCode(path, description);
     }
 
     @Override
     public String toString() {
-        return "ResourceListingAPI{" +
-                "path='" + path + '\'' +
-                ", description='" + description + '\'' +
-                '}';
+        return Objects.toStringHelper(this)
+                .add("path", path)
+                .add("description", description)
+                .toString();
     }
 }

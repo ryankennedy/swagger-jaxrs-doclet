@@ -1,5 +1,7 @@
 package com.hypnoticocelot.jaxrs.doclet.model;
 
+import com.google.common.base.Objects;
+
 import java.util.List;
 
 public class Method {
@@ -61,44 +63,31 @@ public class Method {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
-        Method method1 = (Method) o;
-
-        if (apiParameters != null ? !apiParameters.equals(method1.apiParameters) : method1.apiParameters != null)
-            return false;
-        if (comment != null ? !comment.equals(method1.comment) : method1.comment != null) return false;
-        if (firstSentence != null ? !firstSentence.equals(method1.firstSentence) : method1.firstSentence != null)
-            return false;
-        if (method != null ? !method.equals(method1.method) : method1.method != null) return false;
-        if (methodName != null ? !methodName.equals(method1.methodName) : method1.methodName != null) return false;
-        if (path != null ? !path.equals(method1.path) : method1.path != null) return false;
-        if (returnType != null ? !returnType.equals(method1.returnType) : method1.returnType != null) return false;
-
-        return true;
+        Method that = (Method) o;
+        return Objects.equal(method, that.method)
+                && Objects.equal(methodName, that.methodName)
+                && Objects.equal(apiParameters, that.apiParameters)
+                && Objects.equal(firstSentence, that.firstSentence)
+                && Objects.equal(comment, that.comment)
+                && Objects.equal(returnType, that.returnType)
+                && Objects.equal(path, that.path);
     }
 
     @Override
     public int hashCode() {
-        int result = method != null ? method.hashCode() : 0;
-        result = 31 * result + (methodName != null ? methodName.hashCode() : 0);
-        result = 31 * result + (apiParameters != null ? apiParameters.hashCode() : 0);
-        result = 31 * result + (firstSentence != null ? firstSentence.hashCode() : 0);
-        result = 31 * result + (comment != null ? comment.hashCode() : 0);
-        result = 31 * result + (returnType != null ? returnType.hashCode() : 0);
-        result = 31 * result + (path != null ? path.hashCode() : 0);
-        return result;
+        return Objects.hashCode(method, methodName, apiParameters, firstSentence, comment, returnType, path);
     }
 
     @Override
     public String toString() {
-        return "Method{" +
-                "method='" + method + '\'' +
-                ", methodName='" + methodName + '\'' +
-                ", apiParameters=" + apiParameters +
-                ", firstSentence='" + firstSentence + '\'' +
-                ", comment='" + comment + '\'' +
-                ", returnType='" + returnType + '\'' +
-                ", path='" + path + '\'' +
-                '}';
+        return Objects.toStringHelper(this)
+                .add("method", method)
+                .add("methodName", methodName)
+                .add("apiParameters", apiParameters)
+                .add("firstSentence", firstSentence)
+                .add("comment", comment)
+                .add("returnType", returnType)
+                .add("path", path)
+                .toString();
     }
 }
