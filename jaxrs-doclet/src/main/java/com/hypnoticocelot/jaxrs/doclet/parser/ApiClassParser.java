@@ -18,21 +18,25 @@ public class ApiClassParser {
 
     private final DocletOptions options;
     private final ClassDoc classDoc;
-    private final String apiPath;
+    private final String rootPath;
     private final Set<Model> models;
 
     public ApiClassParser(DocletOptions options, ClassDoc classDoc) {
         this.options = options;
         this.classDoc = classDoc;
-        this.apiPath = parsePath(classDoc.annotations());
+        this.rootPath = parsePath(classDoc.annotations());
         this.models = new LinkedHashSet<Model>();
+    }
+
+    public String getRootPath() {
+        return rootPath;
     }
 
     public Collection<Api> parse() {
         Map<String, Collection<Method>> apiMethods = new HashMap<String, Collection<Method>>();
 
         for (MethodDoc method : classDoc.methods()) {
-            ApiMethodParser methodParser = new ApiMethodParser(options, apiPath, method);
+            ApiMethodParser methodParser = new ApiMethodParser(options, rootPath, method);
             Method parsedMethod = methodParser.parse();
             if (parsedMethod == null) {
                 continue;

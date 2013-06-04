@@ -42,12 +42,9 @@ public class JaxRsAnnotationParser {
                         return model.getId();
                     }
                 });
-                String apiPath = apis.iterator().next().getPath();
-                String rootPath = "/" + (apiPath.startsWith("/") ? apiPath.replaceFirst("/", "") : apiPath).replaceAll("/", "_").replaceAll("(\\{|\\})", "");
-
                 // The idea (and need) for the declaration is that "/foo" and "/foo/annotated" are stored in separate
                 // Api classes but are part of the same resource.
-                declarations.add(new ApiDeclaration(options.getApiVersion(), options.getApiBasePath(), rootPath, apis, models));
+                declarations.add(new ApiDeclaration(options.getApiVersion(), options.getApiBasePath(), classParser.getRootPath(), apis, models));
             }
             writeApis(declarations);
             return true;
@@ -62,8 +59,9 @@ public class JaxRsAnnotationParser {
         Recorder recorder = options.getRecorder();
 
         for (ApiDeclaration api : apis) {
-            resources.add(new ResourceListingAPI(api.getResourcePath() + ".{format}", ""));
-            File apiFile = new File(outputDirectory, api.getResourcePath().replaceFirst("/", "") + ".json");
+            String resourceName = api.getResourcePath().replaceFirst("/", "").replaceAll("/", "_").replaceAll("[\\{\\}]", "");
+            resources.add(new ResourceListingAPI("/" + resourceName + ".{format}", ""));
+            File apiFile = new File(outputDirectory, resourceName + ".json");
             recorder.record(apiFile, api);
         }
 
