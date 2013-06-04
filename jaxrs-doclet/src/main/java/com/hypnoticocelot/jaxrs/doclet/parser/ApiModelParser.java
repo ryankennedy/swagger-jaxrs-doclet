@@ -37,8 +37,10 @@ public class ApiModelParser {
 
         Map<String, Type> types = findReferencedTypes(classDoc);
         Map<String, Property> elements = findReferencedElements(types);
-        models.add(new Model(translator.nameFor(type), elements));
-        parseNestedModels(types.values());
+        if (!elements.isEmpty()) {
+            models.add(new Model(translator.nameFor(type), elements));
+            parseNestedModels(types.values());
+        }
     }
 
     private Map<String, Type> findReferencedTypes(ClassDoc classDoc) {
