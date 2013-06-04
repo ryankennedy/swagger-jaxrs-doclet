@@ -16,15 +16,15 @@ import static com.hypnoticocelot.jaxrs.doclet.parser.AnnotationHelper.parsePath;
 
 public class ApiMethodParser {
 
-    private final Translator translator;
     private final DocletOptions options;
+    private final Translator translator;
     private final String parentPath;
     private final MethodDoc methodDoc;
     private final Set<Model> models;
 
-    public ApiMethodParser(Translator translator, DocletOptions options, String parentPath, MethodDoc methodDoc) {
-        this.translator = translator;
+    public ApiMethodParser(DocletOptions options, String parentPath, MethodDoc methodDoc) {
         this.options = options;
+        this.translator = options.getTranslator();
         this.parentPath = parentPath;
         this.methodDoc = methodDoc;
         this.models = new LinkedHashSet<Model>();

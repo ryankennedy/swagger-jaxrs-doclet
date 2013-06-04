@@ -1,5 +1,7 @@
 package com.hypnoticocelot.jaxrs.doclet;
 
+import com.hypnoticocelot.jaxrs.doclet.translator.*;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +18,16 @@ public class DocletOptions {
     private List<String> excludeAnnotationClasses;
     private boolean parseModels = true;
     private Recorder recorder = new ObjectMapperRecorder();
+    private Translator translator;
 
     private DocletOptions() {
         excludeAnnotationClasses = new ArrayList<String>();
         excludeAnnotationClasses.add("javax.ws.rs.HeaderParam");
         excludeAnnotationClasses.add("javax.ws.rs.core.Context");
+        translator = new FirstNotNullTranslator()
+                .addNext(new JacksonAwareTranslator())
+                .addNext(new JaxbAwareTranslator())
+                .addNext(new NameBasedTranslator());
     }
 
     public File getOutput() {
@@ -55,24 +62,32 @@ public class DocletOptions {
         this.recorder = recorder;
     }
 
+    public Translator getTranslator() {
+        return translator;
+    }
+
+    public void setTranslator(Translator translator) {
+        this.translator = translator;
+    }
+
     public static DocletOptions parse(String[][] options) {
-        DocletOptions parameters = new DocletOptions();
+        DocletOptions parsedOptions = new DocletOptions();
         for (String[] option : options) {
             if (option[0].equals("-d")) {
-                parameters.output = new File(option[1]);
+                parsedOptions.output = new File(option[1]);
             } else if (option[0].equals("-docBasePath")) {
-                parameters.docBasePath = option[1];
+                parsedOptions.docBasePath = option[1];
             } else if (option[0].equals("-apiBasePath")) {
-                parameters.apiBasePath = option[1];
+                parsedOptions.apiBasePath = option[1];
             } else if (option[0].equals("-apiVersion")) {
-                parameters.apiVersion = option[1];
+                parsedOptions.apiVersion = option[1];
             } else if (option[0].equals("-excludeAnnotationClasses")) {
-                parameters.excludeAnnotationClasses.addAll(asList(copyOfRange(option, 1, option.length)));
+                parsedOptions.excludeAnnotationClasses.addAll(asList(copyOfRange(option, 1, option.length)));
             } else if (option[0].equals("-disableModels")) {
-                parameters.parseModels = false;
+                parsedOptions.parseModels = false;
             }
         }
-        return parameters;
+        return parsedOptions;
     }
 
 }

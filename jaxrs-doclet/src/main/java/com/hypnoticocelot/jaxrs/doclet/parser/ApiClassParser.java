@@ -6,7 +6,6 @@ import com.hypnoticocelot.jaxrs.doclet.model.Api;
 import com.hypnoticocelot.jaxrs.doclet.model.Method;
 import com.hypnoticocelot.jaxrs.doclet.model.Model;
 import com.hypnoticocelot.jaxrs.doclet.model.Operation;
-import com.hypnoticocelot.jaxrs.doclet.translator.Translator;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.MethodDoc;
 
@@ -17,14 +16,12 @@ import static com.hypnoticocelot.jaxrs.doclet.parser.AnnotationHelper.parsePath;
 
 public class ApiClassParser {
 
-    private final Translator translator;
     private final DocletOptions options;
     private final ClassDoc classDoc;
     private final String apiPath;
     private final Set<Model> models;
 
-    public ApiClassParser(Translator translator, DocletOptions options, ClassDoc classDoc) {
-        this.translator = translator;
+    public ApiClassParser(DocletOptions options, ClassDoc classDoc) {
         this.options = options;
         this.classDoc = classDoc;
         this.apiPath = parsePath(classDoc.annotations());
@@ -35,7 +32,7 @@ public class ApiClassParser {
         Map<String, Collection<Method>> apiMethods = new HashMap<String, Collection<Method>>();
 
         for (MethodDoc method : classDoc.methods()) {
-            ApiMethodParser methodParser = new ApiMethodParser(translator, options, apiPath, method);
+            ApiMethodParser methodParser = new ApiMethodParser(options, apiPath, method);
             Method parsedMethod = methodParser.parse();
             if (parsedMethod == null) {
                 continue;

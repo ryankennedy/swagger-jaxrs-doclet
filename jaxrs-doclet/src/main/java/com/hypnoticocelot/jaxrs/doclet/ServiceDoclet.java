@@ -1,7 +1,6 @@
 package com.hypnoticocelot.jaxrs.doclet;
 
 import com.hypnoticocelot.jaxrs.doclet.parser.JaxRsAnnotationParser;
-import com.hypnoticocelot.jaxrs.doclet.translator.*;
 import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.RootDoc;
 
@@ -18,11 +17,7 @@ public class ServiceDoclet {
      */
     public static boolean start(RootDoc doc) {
         DocletOptions options = DocletOptions.parse(doc.options());
-        Translator translator = new FirstNotNullTranslator()
-                .addNext(new JacksonAwareTranslator())
-                .addNext(new JaxbAwareTranslator())
-                .addNext(new NameBasedTranslator());
-        return new JaxRsAnnotationParser(translator, options, doc).run();
+        return new JaxRsAnnotationParser(options, doc).run();
     }
 
     /**

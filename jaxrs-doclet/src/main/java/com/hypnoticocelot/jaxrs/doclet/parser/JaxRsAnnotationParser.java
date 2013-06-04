@@ -4,7 +4,6 @@ import com.google.common.base.Function;
 import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
 import com.hypnoticocelot.jaxrs.doclet.ServiceDoclet;
 import com.hypnoticocelot.jaxrs.doclet.model.*;
-import com.hypnoticocelot.jaxrs.doclet.translator.Translator;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.RootDoc;
 
@@ -18,12 +17,10 @@ import static com.google.common.collect.Maps.uniqueIndex;
 
 public class JaxRsAnnotationParser {
 
-    private final Translator translator;
     private final DocletOptions options;
     private final RootDoc rootDoc;
 
-    public JaxRsAnnotationParser(Translator translator, DocletOptions options, RootDoc rootDoc) {
-        this.translator = translator;
+    public JaxRsAnnotationParser(DocletOptions options, RootDoc rootDoc) {
         this.options = options;
         this.rootDoc = rootDoc;
     }
@@ -32,7 +29,7 @@ public class JaxRsAnnotationParser {
         try {
             Collection<ApiDeclaration> declarations = new ArrayList<ApiDeclaration>();
             for (ClassDoc classDoc : rootDoc.classes()) {
-                ApiClassParser classParser = new ApiClassParser(translator, options, classDoc);
+                ApiClassParser classParser = new ApiClassParser(options, classDoc);
                 Collection<Api> apis = classParser.parse();
                 if (apis.isEmpty()) {
                     continue;

@@ -53,7 +53,8 @@ public class ServiceDocletTest {
         final TestRecorder recorder = new TestRecorder();
         DocletOptions options = DocletOptions.parse(rootDoc.options());
         options.setRecorder(recorder);
-        assertTrue("ServiceDoclet failed", new JaxRsAnnotationParser(new NameBasedTranslator(), options, rootDoc).run());
+        options.setTranslator(new NameBasedTranslator());
+        assertTrue("JavaDoc generation failed", new JaxRsAnnotationParser(options, rootDoc).run());
 
         final ResourceListing expectedListing = mapper.readValue(getClass().getResourceAsStream("/fixtures/sample/service.json"), ResourceListing.class);
         assertThat(recorder.getListing(new File("service.json")), equalTo(expectedListing));
