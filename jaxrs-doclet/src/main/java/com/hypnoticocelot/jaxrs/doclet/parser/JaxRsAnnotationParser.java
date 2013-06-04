@@ -46,7 +46,9 @@ public class JaxRsAnnotationParser {
                         return model.getId();
                     }
                 });
-                declarations.add(new ApiDeclaration(options.getApiVersion(), options.getApiBasePath(), apis, models));
+                String apiPath = apis.iterator().next().getPath();
+                String rootPath = "/" + (apiPath.startsWith("/") ? apiPath.replaceFirst("/", "") : apiPath).replaceAll("/", "_").replaceAll("(\\{|\\})", "");
+                declarations.add(new ApiDeclaration(options.getApiVersion(), options.getApiBasePath(), rootPath, apis, models));
             }
             writeApis(declarations);
             return true;
@@ -58,11 +60,8 @@ public class JaxRsAnnotationParser {
     private void writeApis(Collection<ApiDeclaration> apis) throws IOException {
         List<ResourceListingAPI> resources = new LinkedList<ResourceListingAPI>();
         for (ApiDeclaration api : apis) {
-            String apiPath = api.getApis().iterator().next().getPath();
-            String rootPath = (apiPath.startsWith("/") ? apiPath.replaceFirst("/", "") : apiPath).replaceAll("/", "_").replaceAll("(\\{|\\})", "");
-            resources.add(new ResourceListingAPI("/" + rootPath + ".{format}", ""));
-
-            File apiFile = new File(options.getOutput(), rootPath + ".json");
+            resources.add(new ResourceListingAPI(api.getResourcePath() + ".{format}", ""));
+            File apiFile = new File(options.getOutput(), api.getResourcePath().replaceFirst("/", "") + ".json");
             options.getRecorder().record(apiFile, api);
         }
 
