@@ -71,10 +71,21 @@ public class ApiModelParser {
     private Map<String, Property> findReferencedElements(Map<String, Type> types) {
         Map<String, Property> elements = new HashMap<String, Property>();
         for (Map.Entry<String, Type> entry : types.entrySet()) {
-            Type containerOf = parseParameterisedTypeOf(entry.getValue());
+            String typeName = entry.getKey();
+            Type type = entry.getValue();
+            ClassDoc typeClassDoc = type.asClassDoc();
+
+            Type containerOf = parseParameterisedTypeOf(type);
             String containerTypeOf = containerOf == null ? null : translator.nameFor(containerOf);
-            String eleTypeName = translator.nameFor(entry.getValue());
-            elements.put(entry.getKey(), new Property(eleTypeName, null, containerTypeOf));
+
+            String propertyName = translator.nameFor(type);
+            Property property;
+            if (typeClassDoc != null && typeClassDoc.isEnum()) {
+                property = new Property(typeClassDoc.enumConstants(), null);
+            } else {
+                property = new Property(propertyName, null, containerTypeOf);
+            }
+            elements.put(typeName, property);
         }
         return elements;
     }
