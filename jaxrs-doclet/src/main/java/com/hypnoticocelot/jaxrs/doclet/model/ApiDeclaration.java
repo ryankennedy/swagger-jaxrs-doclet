@@ -24,8 +24,8 @@ public class ApiDeclaration {
         this.swaggerVersion = "1.1";
         this.basePath = basePath;
         this.resourcePath = resourcePath;
-        this.apis = apis;
-        this.models = models;
+        this.apis = apis.isEmpty() ? null : apis;
+        this.models = models.isEmpty() ? null : models;
     }
 
     public String getApiVersion() {

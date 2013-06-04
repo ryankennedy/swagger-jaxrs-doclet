@@ -5,6 +5,8 @@ import com.google.common.base.Objects;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.common.base.Strings.emptyToNull;
+
 public class ApiParameter {
     private String paramType;
     private String name;
@@ -18,7 +20,7 @@ public class ApiParameter {
     public ApiParameter(String paramType, String name, String description, String dataType) {
         this.paramType = paramType;
         this.name = name;
-        this.description = description;
+        this.description = emptyToNull(description);
         this.dataType = dataType;
     }
 

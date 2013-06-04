@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Strings.emptyToNull;
 import static com.google.common.collect.Lists.transform;
 import static java.util.Arrays.asList;
 
@@ -23,7 +24,7 @@ public class Property {
 
     public Property(String type, String description, String containerOf) {
         this.type = type;
-        this.description = description;
+        this.description = emptyToNull(description);
         this.containerOf = containerOf;
         if (type.equals("boolean")) {
             List<String> values = new ArrayList<String>();

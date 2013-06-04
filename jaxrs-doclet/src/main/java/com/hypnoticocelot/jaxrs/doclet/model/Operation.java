@@ -5,6 +5,8 @@ import com.hypnoticocelot.jaxrs.doclet.parser.AnnotationHelper;
 
 import java.util.List;
 
+import static com.google.common.base.Strings.emptyToNull;
+
 public class Operation {
 
     private HttpMethod httpMethod;
@@ -20,11 +22,11 @@ public class Operation {
 
     public Operation(Method method) {
         this.httpMethod = method.getMethod();
-        this.nickname = method.getMethodName();
-        this.responseClass = AnnotationHelper.typeOf(method.getReturnType());
-        this.parameters = method.getParameters();
-        this.summary = method.getFirstSentence();
-        this.notes = method.getComment();
+        this.nickname = emptyToNull(method.getMethodName());
+        this.responseClass = emptyToNull(AnnotationHelper.typeOf(method.getReturnType()));
+        this.parameters = method.getParameters() == null ? null : method.getParameters();
+        this.summary = emptyToNull(method.getFirstSentence());
+        this.notes = emptyToNull(method.getComment());
     }
 
     public HttpMethod getHttpMethod() {

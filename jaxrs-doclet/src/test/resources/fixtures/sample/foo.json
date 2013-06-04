@@ -16,12 +16,9 @@
                         {
                             "paramType": "query",
                             "name": "name",
-                            "description": "",
                             "dataType": "string"
                         }
-                    ],
-                    "summary": "",
-                    "notes": ""
+                    ]
                 },
                 {
                     "httpMethod": "POST",
@@ -31,12 +28,9 @@
                         {
                             "paramType": "body",
                             "name": "speech",
-                            "description": "",
                             "dataType": "string"
                         }
-                    ],
-                    "summary": "",
-                    "notes": ""
+                    ]
                 }
             ]
         },
@@ -52,15 +46,11 @@
                         {
                             "paramType": "body",
                             "name": "speech",
-                            "description": "",
                             "dataType": "string"
                         }
-                    ],
-                    "summary": "",
-                    "notes": ""
+                    ]
                 }
             ]
         }
-    ],
-    "models": { }
+    ]
 }
