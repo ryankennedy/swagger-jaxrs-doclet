@@ -64,7 +64,7 @@ public class JacksonAwareTranslator implements Translator {
         if (element.isAnnotatedBy(JSON_IGNORE)) {
             return ignored();
         }
-        return presentOrMissing(element.getAnnotationValue(annotation, "name"));
+        return presentOrMissing(element.getAnnotationValue(annotation, "value"));
     }
 
 }
