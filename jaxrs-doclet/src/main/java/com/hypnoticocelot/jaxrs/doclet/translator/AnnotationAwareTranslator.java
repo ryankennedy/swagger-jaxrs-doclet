@@ -13,18 +13,37 @@ import java.util.Map;
 import static com.hypnoticocelot.jaxrs.doclet.translator.Translator.OptionalName.ignored;
 import static com.hypnoticocelot.jaxrs.doclet.translator.Translator.OptionalName.presentOrMissing;
 
-public class JacksonAwareTranslator implements Translator {
-
-    private static final String JSON_ROOT = "com.fasterxml.jackson.annotation.JsonRootName";
-    private static final String JSON_ELEMENT = "com.fasterxml.jackson.annotation.JsonProperty";
-    private static final String JSON_IGNORE = "com.fasterxml.jackson.annotation.JsonIgnore";
+public class AnnotationAwareTranslator implements Translator {
 
     private final Map<OptionalName, Type> reverseIndex;
     private final Map<Type, OptionalName> namedTypes;
 
-    public JacksonAwareTranslator() {
+    private String ignore;
+    private String element;
+    private String elementProperty;
+    private String rootElement;
+    private String rootElementProperty;
+
+    public AnnotationAwareTranslator() {
         reverseIndex = new HashMap<OptionalName, Type>();
         namedTypes = new HashMap<Type, OptionalName>();
+    }
+
+    public AnnotationAwareTranslator ignore(String qualifiedAnnotationType) {
+        this.ignore = qualifiedAnnotationType;
+        return this;
+    }
+
+    public AnnotationAwareTranslator element(String qualifiedAnnotationType, String property) {
+        this.element = qualifiedAnnotationType;
+        this.elementProperty = property;
+        return this;
+    }
+
+    public AnnotationAwareTranslator rootElement(String qualifiedAnnotationType, String property) {
+        this.rootElement = qualifiedAnnotationType;
+        this.rootElementProperty = property;
+        return this;
     }
 
     @Override
@@ -36,7 +55,7 @@ public class JacksonAwareTranslator implements Translator {
             return null;
         }
 
-        OptionalName name = nameFor(JSON_ROOT, type.asClassDoc());
+        OptionalName name = nameFor(rootElement, rootElementProperty, type.asClassDoc());
         if (name.isPresent()) {
             StringBuilder nameBuilder = new StringBuilder(name.value());
             while (reverseIndex.containsKey(name)) {
@@ -51,20 +70,20 @@ public class JacksonAwareTranslator implements Translator {
 
     @Override
     public OptionalName fieldName(FieldDoc field) {
-        return nameFor(JSON_ELEMENT, field);
+        return nameFor(element, elementProperty, field);
     }
 
     @Override
     public OptionalName methodName(MethodDoc method) {
-        return nameFor(JSON_ELEMENT, method);
+        return nameFor(element, elementProperty, method);
     }
 
-    private OptionalName nameFor(String annotation, ProgramElementDoc doc) {
+    private OptionalName nameFor(String annotation, String property, ProgramElementDoc doc) {
         AnnotationParser element = new AnnotationParser(doc);
-        if (element.isAnnotatedBy(JSON_IGNORE)) {
+        if (element.isAnnotatedBy(ignore)) {
             return ignored();
         }
-        return presentOrMissing(element.getAnnotationValue(annotation, "value"));
+        return presentOrMissing(element.getAnnotationValue(annotation, property));
     }
 
 }

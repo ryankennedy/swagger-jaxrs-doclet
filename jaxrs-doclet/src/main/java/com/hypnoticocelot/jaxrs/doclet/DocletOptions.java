@@ -1,6 +1,9 @@
 package com.hypnoticocelot.jaxrs.doclet;
 
-import com.hypnoticocelot.jaxrs.doclet.translator.*;
+import com.hypnoticocelot.jaxrs.doclet.translator.AnnotationAwareTranslator;
+import com.hypnoticocelot.jaxrs.doclet.translator.FirstNotNullTranslator;
+import com.hypnoticocelot.jaxrs.doclet.translator.NameBasedTranslator;
+import com.hypnoticocelot.jaxrs.doclet.translator.Translator;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,8 +29,16 @@ public class DocletOptions {
         excludeAnnotationClasses.add("javax.ws.rs.HeaderParam");
         excludeAnnotationClasses.add("javax.ws.rs.core.Context");
         translator = new FirstNotNullTranslator()
-                .addNext(new JacksonAwareTranslator())
-                .addNext(new JaxbAwareTranslator())
+                .addNext(new AnnotationAwareTranslator()
+                        .ignore("javax.xml.bind.annotation.XmlTransient")
+                        .element("javax.xml.bind.annotation.XmlElement", "name")
+                        .rootElement("javax.xml.bind.annotation.XmlRootElement", "name")
+                )
+                .addNext(new AnnotationAwareTranslator()
+                        .ignore("com.fasterxml.jackson.annotation.JsonIgnore")
+                        .element("com.fasterxml.jackson.annotation.JsonProperty", "value")
+                        .rootElement("com.fasterxml.jackson.annotation.JsonRootName", "value")
+                )
                 .addNext(new NameBasedTranslator());
     }
 
