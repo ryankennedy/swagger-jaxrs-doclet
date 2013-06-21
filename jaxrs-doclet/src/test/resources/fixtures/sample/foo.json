@@ -20,6 +20,42 @@
                     ],
                     "summary": "",
                     "notes": ""
+                },
+                {
+                    "httpMethod": "POST",
+                    "nickname": "createSpeech",
+                    "responseClass": "int",
+                    "parameters": [
+                        {
+                            "paramType": "body",
+                            "name": "speech",
+                            "description": null,
+                            "dataType": "string"
+                        }
+                    ],
+                    "summary": "",
+                    "notes": ""
+                }
+            ]
+        },
+        {
+            "path": "/foo/annotated",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "POST",
+                    "nickname": "createSpeechWithAnnotatedPayload",
+                    "responseClass": "int",
+                    "parameters": [
+                        {
+                            "paramType": "body",
+                            "name": "speech",
+                            "description": null,
+                            "dataType": "string"
+                        }
+                    ],
+                    "summary": "",
+                    "notes": ""
                 }
             ]
         }

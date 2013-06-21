@@ -3,7 +3,7 @@ package com.hypnoticocelot.jaxrs.doclet;
 import java.util.List;
 
 public class Method {
-    private String method;
+    private HttpMethod method;
     private String methodName;
     private List<ApiParameter> apiParameters;
     private String firstSentence;
@@ -15,7 +15,7 @@ public class Method {
     private Method() {
     }
 
-    public Method(String method, String methodName, String path, List<ApiParameter> apiParameters, String firstSentence, String comment, String returnType) {
+    public Method(HttpMethod method, String methodName, String path, List<ApiParameter> apiParameters, String firstSentence, String comment, String returnType) {
         this.method = method;
         this.methodName = methodName;
         this.path = path;
@@ -25,7 +25,7 @@ public class Method {
         this.returnType = returnType;
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 
