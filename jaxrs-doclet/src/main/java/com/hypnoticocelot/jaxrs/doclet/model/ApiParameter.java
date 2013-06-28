@@ -1,7 +1,11 @@
-package com.hypnoticocelot.jaxrs.doclet;
+package com.hypnoticocelot.jaxrs.doclet.model;
+
+import com.google.common.base.Objects;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.base.Strings.emptyToNull;
 
 public class ApiParameter {
     private String paramType;
@@ -16,7 +20,7 @@ public class ApiParameter {
     public ApiParameter(String paramType, String name, String description, String dataType) {
         this.paramType = paramType;
         this.name = name;
-        this.description = description;
+        this.description = emptyToNull(description);
         this.dataType = dataType;
     }
 
@@ -55,33 +59,25 @@ public class ApiParameter {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         ApiParameter that = (ApiParameter) o;
-
-        if (dataType != null ? !dataType.equals(that.dataType) : that.dataType != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (paramType != null ? !paramType.equals(that.paramType) : that.paramType != null) return false;
-
-        return true;
+        return Objects.equal(paramType, that.paramType)
+                && Objects.equal(name, that.name)
+                && Objects.equal(description, that.description)
+                && Objects.equal(dataType, that.dataType);
     }
 
     @Override
     public int hashCode() {
-        int result = paramType != null ? paramType.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (dataType != null ? dataType.hashCode() : 0);
-        return result;
+        return Objects.hashCode(paramType, name, description, dataType);
     }
 
     @Override
     public String toString() {
-        return "ApiParameter{" +
-                "paramType='" + paramType + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", dataType='" + dataType + '\'' +
-                '}';
+        return Objects.toStringHelper(this)
+                .add("paramType", paramType)
+                .add("name", name)
+                .add("description", description)
+                .add("dataType", dataType)
+                .toString();
     }
 }

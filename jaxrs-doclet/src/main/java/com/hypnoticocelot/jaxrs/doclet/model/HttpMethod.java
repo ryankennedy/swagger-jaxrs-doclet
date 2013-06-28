@@ -1,4 +1,4 @@
-package com.hypnoticocelot.jaxrs.doclet;
+package com.hypnoticocelot.jaxrs.doclet.model;
 
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.MethodDoc;

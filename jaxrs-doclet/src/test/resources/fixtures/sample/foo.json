@@ -1,6 +1,8 @@
 {
     "apiVersion": "0",
+    "swaggerVersion": "1.1",
     "basePath": "http://localhost:8080",
+    "resourcePath": "/foo",
     "apis": [
         {
             "path": "/foo",
@@ -14,12 +16,9 @@
                         {
                             "paramType": "query",
                             "name": "name",
-                            "description": null,
                             "dataType": "string"
                         }
-                    ],
-                    "summary": "",
-                    "notes": ""
+                    ]
                 },
                 {
                     "httpMethod": "POST",
@@ -29,12 +28,9 @@
                         {
                             "paramType": "body",
                             "name": "speech",
-                            "description": null,
                             "dataType": "string"
                         }
-                    ],
-                    "summary": "",
-                    "notes": ""
+                    ]
                 }
             ]
         },
@@ -50,15 +46,11 @@
                         {
                             "paramType": "body",
                             "name": "speech",
-                            "description": null,
                             "dataType": "string"
                         }
-                    ],
-                    "summary": "",
-                    "notes": ""
+                    ]
                 }
             ]
         }
-    ],
-    "models": { }
+    ]
 }

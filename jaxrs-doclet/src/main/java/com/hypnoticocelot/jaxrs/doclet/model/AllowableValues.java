@@ -1,4 +1,6 @@
-package com.hypnoticocelot.jaxrs.doclet;
+package com.hypnoticocelot.jaxrs.doclet.model;
+
+import com.google.common.base.Objects;
 
 import java.util.List;
 
@@ -7,7 +9,6 @@ public class AllowableValues {
 
     @SuppressWarnings("unused")
     private AllowableValues() {
-
     }
 
     public AllowableValues(List<String> values) {
@@ -26,23 +27,19 @@ public class AllowableValues {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         AllowableValues that = (AllowableValues) o;
-
-        if (values != null ? !values.equals(that.values) : that.values != null) return false;
-
-        return true;
+        return Objects.equal(values, that.values);
     }
 
     @Override
     public int hashCode() {
-        return values != null ? values.hashCode() : 0;
+        return Objects.hashCode(values);
     }
 
     @Override
     public String toString() {
-        return "AllowableValues{" +
-                "values=" + values +
-                '}';
+        return Objects.toStringHelper(this)
+                .add("values", values)
+                .toString();
     }
 }
