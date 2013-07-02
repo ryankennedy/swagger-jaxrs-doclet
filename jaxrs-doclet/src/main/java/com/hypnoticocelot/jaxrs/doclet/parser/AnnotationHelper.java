@@ -15,7 +15,8 @@ public class AnnotationHelper {
     private static final String JAX_RS_PATH = "javax.ws.rs.Path";
     private static final String JAX_RS_PATH_PARAM = "javax.ws.rs.PathParam";
     private static final String JAX_RS_QUERY_PARAM = "javax.ws.rs.QueryParam";
-
+    private static final String JERSEY_MULTIPART_FORM_PARAM = "com.sun.jersey.multipart.FormDataParam";
+    
     @SuppressWarnings("serial")
     static final List<String> PRIMITIVES = new ArrayList<String>() {{
         add("byte");
@@ -82,6 +83,8 @@ public class AnnotationHelper {
             return "path";
         } else if (p.isAnnotatedBy(JAX_RS_QUERY_PARAM)) {
             return "query";
+        } else if(p.isAnnotatedBy(JERSEY_MULTIPART_FORM_PARAM)) {
+        	return "form";
         }
         return "body";
     }
