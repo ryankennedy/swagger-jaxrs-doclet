@@ -38,7 +38,7 @@ public class AnnotationHelper {
                         if (path.endsWith("/")) {
                             path = path.substring(0, path.length() - 1);
                         }
-                        return path.startsWith("/") ? path : "/" + path;
+                        return path.isEmpty() || path.startsWith("/") ? path : "/" + path;
                     }
                 }
             }
