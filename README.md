@@ -66,3 +66,44 @@ To use the Swagger Doclet in your Maven project, add the following to your POM f
     </build>
 </xml>
 ```
+
+## Example
+
+An example project using Dropwizard is included in `jaxrs-doclet-sample-dropwizard`. To get it running, run the following commands.
+
+```
+$ cd jaxrs-doclet-sample-dropwizard
+$ mvn package
+$ java -jar target/jaxrs-doclet-sample-dropwizard target/jaxrs-doclet-sample-dropwizard-0.0.2-SNAPSHOT.jar sample.yml
+```
+
+The example server should be running on port 8080:
+
+```
+$ curl localhost:8080/apidocs/service.json
+{
+  "apiVersion" : "1",
+  "basePath" : "/apidocs/",
+  "apis" : [ {
+    "path" : "/Auth.{format}",
+    "description" : ""
+  }, {
+    "path" : "/HttpServletRequest.{format}",
+    "description" : ""
+  }, {
+    "path" : "/ModelResource_modelid.{format}",
+    "description" : ""
+  }, {
+    "path" : "/Recursive.{format}",
+    "description" : ""
+  }, {
+    "path" : "/Response.{format}",
+    "description" : ""
+  }, {
+    "path" : "/greetings_name.{format}",
+    "description" : ""
+  } ],
+  "swaggerVersion" : "1.1"
+}
+$
+```
