@@ -8,6 +8,7 @@ public class Method {
     private HttpMethod method;
     private String methodName;
     private List<ApiParameter> apiParameters;
+    private List<ApiResponseMessage> responseMessages;
     private String firstSentence;
     private String comment;
     private String returnType;
@@ -17,11 +18,12 @@ public class Method {
     private Method() {
     }
 
-    public Method(HttpMethod method, String methodName, String path, List<ApiParameter> apiParameters, String firstSentence, String comment, String returnType) {
+    public Method(HttpMethod method, String methodName, String path, List<ApiParameter> apiParameters, List<ApiResponseMessage> responseMessages, String firstSentence, String comment, String returnType) {
         this.method = method;
         this.methodName = methodName;
         this.path = path;
         this.apiParameters = apiParameters;
+        this.responseMessages = responseMessages;
         this.firstSentence = firstSentence;
         this.comment = comment;
         this.returnType = returnType;
@@ -41,6 +43,10 @@ public class Method {
 
     public List<ApiParameter> getParameters() {
         return apiParameters;
+    }
+    
+    public List<ApiResponseMessage> getResponseMessages() {
+        return responseMessages;
     }
 
     public String getFirstSentence() {
@@ -67,6 +73,7 @@ public class Method {
         return Objects.equal(method, that.method)
                 && Objects.equal(methodName, that.methodName)
                 && Objects.equal(apiParameters, that.apiParameters)
+                && Objects.equal(responseMessages, that.responseMessages)
                 && Objects.equal(firstSentence, that.firstSentence)
                 && Objects.equal(comment, that.comment)
                 && Objects.equal(returnType, that.returnType)
@@ -75,7 +82,7 @@ public class Method {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(method, methodName, apiParameters, firstSentence, comment, returnType, path);
+        return Objects.hashCode(method, methodName, apiParameters, responseMessages, firstSentence, comment, returnType, path);
     }
 
     @Override
@@ -84,6 +91,7 @@ public class Method {
                 .add("method", method)
                 .add("methodName", methodName)
                 .add("apiParameters", apiParameters)
+                .add("responseMessages", responseMessages)
                 .add("firstSentence", firstSentence)
                 .add("comment", comment)
                 .add("returnType", returnType)

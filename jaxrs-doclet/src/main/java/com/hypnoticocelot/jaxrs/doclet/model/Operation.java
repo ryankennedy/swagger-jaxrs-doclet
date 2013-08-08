@@ -1,5 +1,6 @@
 package com.hypnoticocelot.jaxrs.doclet.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 import com.hypnoticocelot.jaxrs.doclet.parser.AnnotationHelper;
 
@@ -16,6 +17,9 @@ public class Operation {
     private String summary; // cap at 60 characters for readability in the UI
     private String notes;
 
+    @JsonProperty("errorResponses")                    // swagger 1.1 name
+    private List<ApiResponseMessage> responseMessages; // swagger 1.2 name
+
     @SuppressWarnings("unused")
     private Operation() {
     }
@@ -25,6 +29,7 @@ public class Operation {
         this.nickname = emptyToNull(method.getMethodName());
         this.responseClass = emptyToNull(AnnotationHelper.typeOf(method.getReturnType()));
         this.parameters = method.getParameters().isEmpty() ? null : method.getParameters();
+        this.responseMessages = method.getResponseMessages().isEmpty() ? null : method.getResponseMessages();
         this.summary = emptyToNull(method.getFirstSentence());
         this.notes = emptyToNull(method.getComment());
     }
@@ -44,6 +49,10 @@ public class Operation {
     public List<ApiParameter> getParameters() {
         return parameters;
     }
+    
+    public List<ApiResponseMessage> getResponseMessages() {
+        return responseMessages;
+    }
 
     public String getSummary() {
         return summary;
@@ -62,13 +71,14 @@ public class Operation {
                 && Objects.equal(nickname, that.nickname)
                 && Objects.equal(responseClass, that.responseClass)
                 && Objects.equal(parameters, that.parameters)
+                && Objects.equal(responseMessages, that.responseMessages)
                 && Objects.equal(summary, that.summary)
                 && Objects.equal(notes, that.notes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(httpMethod, nickname, responseClass, parameters, summary, notes);
+        return Objects.hashCode(httpMethod, nickname, responseClass, parameters, responseMessages, summary, notes);
     }
 
     @Override
@@ -78,6 +88,7 @@ public class Operation {
                 .add("nickname", nickname)
                 .add("responseClass", responseClass)
                 .add("parameters", parameters)
+                .add("responseMessages", responseMessages)
                 .add("summary", summary)
                 .add("notes", notes)
                 .toString();
