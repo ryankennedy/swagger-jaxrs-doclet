@@ -61,11 +61,13 @@ public class ApiMethodParser {
         // response messages
         Pattern pattern = Pattern.compile("(\\d+) (.+)"); // matches "<code><space><text>"
         List<ApiResponseMessage> responseMessages = new LinkedList<ApiResponseMessage>();
-        for (Tag tag : methodDoc.tags("@errorResponse")) {
-            Matcher matcher = pattern.matcher(tag.text());
-            if (matcher.find()) {
-                responseMessages.add(new ApiResponseMessage(Integer.valueOf(matcher.group(1)),
-                        matcher.group(2)));
+        for (String tagName : options.getErrorTags()) {
+            for (Tag tagValue : methodDoc.tags(tagName)) {
+                Matcher matcher = pattern.matcher(tagValue.text());
+                if (matcher.find()) {
+                    responseMessages.add(new ApiResponseMessage(Integer.valueOf(matcher.group(1)),
+                            matcher.group(2)));
+                }
             }
         }
 

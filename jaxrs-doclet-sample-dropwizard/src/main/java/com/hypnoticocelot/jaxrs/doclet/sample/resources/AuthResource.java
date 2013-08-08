@@ -7,6 +7,9 @@ import javax.ws.rs.Path;
 
 @Path("/Auth")
 public class AuthResource {
+    /**
+     * @status 404 not found
+     */
     @GET
     public String authorize(@Auth String user) {
         return "USER = " + user;
