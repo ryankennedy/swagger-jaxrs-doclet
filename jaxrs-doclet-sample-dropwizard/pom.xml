@@ -53,7 +53,7 @@
                             </docletArtifact>
                             <reportOutputDirectory>${project.build.outputDirectory}</reportOutputDirectory>
                             <useStandardDocletOptions>false</useStandardDocletOptions>
-                            <additionalparam>-apiVersion 1 -docBasePath /apidocs/ -apiBasePath /</additionalparam>
+                            <additionalparam>-apiVersion 1 -docBasePath /apidocs/ -apiBasePath / -errorTags @status</additionalparam>
                         </configuration>
                         <goals>
                             <goal>javadoc</goal>

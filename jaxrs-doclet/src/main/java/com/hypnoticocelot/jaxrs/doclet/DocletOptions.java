@@ -20,6 +20,7 @@ public class DocletOptions {
     private String apiBasePath = "http://localhost:8080";
     private String apiVersion = "0";
     private List<String> excludeAnnotationClasses;
+    private List<String> errorTags;
     private boolean parseModels = true;
     private Recorder recorder = new ObjectMapperRecorder();
     private Translator translator;
@@ -28,6 +29,9 @@ public class DocletOptions {
         excludeAnnotationClasses = new ArrayList<String>();
         excludeAnnotationClasses.add("javax.ws.rs.HeaderParam");
         excludeAnnotationClasses.add("javax.ws.rs.core.Context");
+        errorTags = new ArrayList<String>();
+        errorTags.add("errorResponse");   // swagger 1.1
+        errorTags.add("responseMessage"); // swagger 1.2
         translator = new FirstNotNullTranslator()
                 .addNext(new AnnotationAwareTranslator()
                         .ignore("javax.xml.bind.annotation.XmlTransient")
@@ -58,6 +62,8 @@ public class DocletOptions {
                 parsedOptions.excludeAnnotationClasses.addAll(asList(copyOfRange(option, 1, option.length)));
             } else if (option[0].equals("-disableModels")) {
                 parsedOptions.parseModels = false;
+            } else if (option[0].equals("-errorTags")) {
+                parsedOptions.errorTags.addAll(asList(copyOfRange(option, 1, option.length)));;
             }
         }
         return parsedOptions;
@@ -81,6 +87,10 @@ public class DocletOptions {
 
     public List<String> getExcludeAnnotationClasses() {
         return excludeAnnotationClasses;
+    }
+    
+    public List<String> getErrorTags() {
+        return errorTags;
     }
 
     public boolean isParseModels() {

@@ -2,6 +2,7 @@ package com.hypnoticocelot.jaxrs.doclet.parser;
 
 import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
 import com.hypnoticocelot.jaxrs.doclet.model.ApiParameter;
+import com.hypnoticocelot.jaxrs.doclet.model.ApiResponseMessage;
 import com.hypnoticocelot.jaxrs.doclet.model.HttpMethod;
 import com.hypnoticocelot.jaxrs.doclet.model.Method;
 import com.hypnoticocelot.jaxrs.doclet.model.Model;
@@ -9,6 +10,8 @@ import com.hypnoticocelot.jaxrs.doclet.translator.Translator;
 import com.sun.javadoc.*;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.Objects.firstNonNull;
 import static com.google.common.collect.Collections2.filter;
@@ -55,6 +58,19 @@ public class ApiMethodParser {
             ));
         }
 
+        // response messages
+        Pattern pattern = Pattern.compile("(\\d+) (.+)"); // matches "<code><space><text>"
+        List<ApiResponseMessage> responseMessages = new LinkedList<ApiResponseMessage>();
+        for (String tagName : options.getErrorTags()) {
+            for (Tag tagValue : methodDoc.tags(tagName)) {
+                Matcher matcher = pattern.matcher(tagValue.text());
+                if (matcher.find()) {
+                    responseMessages.add(new ApiResponseMessage(Integer.valueOf(matcher.group(1)),
+                            matcher.group(2)));
+                }
+            }
+        }
+
         // return type
         Type type = methodDoc.returnType();
         String returnType = translator.typeName(type).value();
@@ -75,6 +91,7 @@ public class ApiMethodParser {
                 methodDoc.name(),
                 path,
                 parameters,
+                responseMessages,
                 firstSentences,
                 methodDoc.commentText().replace(firstSentences, ""),
                 returnType
