@@ -5,7 +5,7 @@
     <parent>
         <artifactId>jaxrs-doclet-parent</artifactId>
         <groupId>com.hypnoticocelot</groupId>
-        <version>0.0.2</version>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>jaxrs-doclet-sample-dropwizard</artifactId>
