@@ -30,8 +30,9 @@ public class ApiModelParser {
     private void parseModel(Type type) {
         boolean isPrimitive = /* type.isPrimitive()? || */ AnnotationHelper.isPrimitive(type);
         boolean isJavaxType = type.qualifiedTypeName().startsWith("javax.");
+        boolean isBaseObject = type.qualifiedTypeName().equals("java.lang.Object");
         ClassDoc classDoc = type.asClassDoc();
-        if (isPrimitive || isJavaxType || classDoc == null || alreadyStoredType(type)) {
+        if (isPrimitive || isJavaxType || isBaseObject || classDoc == null || alreadyStoredType(type)) {
             return;
         }
 
