@@ -18,19 +18,6 @@ To use the Swagger Doclet in your Maven project, add the following to your POM f
     <artifactId>…</artifactId>
     <version>…</version>
     
-    <repositories>
-        <repository>
-            <id>com.hypnoticocelot</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <dependencies>
         …
     </dependencies>
@@ -40,7 +27,7 @@ To use the Swagger Doclet in your Maven project, add the following to your POM f
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.8</version>
+                <version>2.9.1</version>
                 <executions>
                     <execution>
                         <id>generate-service-docs</id>
@@ -50,7 +37,7 @@ To use the Swagger Doclet in your Maven project, add the following to your POM f
                             <docletArtifact>
                                 <groupId>com.hypnoticocelot</groupId>
                                 <artifactId>jaxrs-doclet</artifactId>
-                                <version>0.0.2-SNAPSHOT</version>
+                                <version>0.0.2</version>
                             </docletArtifact>
                             <reportOutputDirectory>${project.build.outputDirectory}</reportOutputDirectory>
                             <useStandardDocletOptions>false</useStandardDocletOptions>
