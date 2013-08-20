@@ -48,7 +48,7 @@ public class ApiMethodParser {
                 continue;
             }
             if (options.isParseModels()) {
-                models.addAll(new ApiModelParser(translator, parameter.type()).parse());
+                models.addAll(new ApiModelParser(options, translator, parameter.type()).parse());
             }
             parameters.add(new ApiParameter(
                     AnnotationHelper.paramTypeOf(parameter),
@@ -75,7 +75,7 @@ public class ApiMethodParser {
         Type type = methodDoc.returnType();
         String returnType = translator.typeName(type).value();
         if (options.isParseModels()) {
-            models.addAll(new ApiModelParser(translator, type).parse());
+            models.addAll(new ApiModelParser(options, translator, type).parse());
         }
 
         // First Sentence of Javadoc method description
