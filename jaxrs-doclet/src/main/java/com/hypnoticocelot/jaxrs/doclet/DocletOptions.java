@@ -19,8 +19,9 @@ public class DocletOptions {
     private String docBasePath = "http://localhost:8080";
     private String apiBasePath = "http://localhost:8080";
     private String apiVersion = "0";
-    private List<String> excludeAnnotationClasses;
+    private List<String> typesToTreatAsOpaque;
     private List<String> errorTags;
+    private List<String> excludeAnnotationClasses;
     private boolean parseModels = true;
     private Recorder recorder = new ObjectMapperRecorder();
     private Translator translator;
@@ -32,6 +33,9 @@ public class DocletOptions {
         errorTags = new ArrayList<String>();
         errorTags.add("errorResponse");   // swagger 1.1
         errorTags.add("responseMessage"); // swagger 1.2
+        typesToTreatAsOpaque = new ArrayList<String>();
+        typesToTreatAsOpaque.add("org.joda.time.DateTime");
+        typesToTreatAsOpaque.add("java.util.UUID");
         translator = new FirstNotNullTranslator()
                 .addNext(new AnnotationAwareTranslator()
                         .ignore("javax.xml.bind.annotation.XmlTransient")
@@ -64,6 +68,8 @@ public class DocletOptions {
                 parsedOptions.parseModels = false;
             } else if (option[0].equals("-errorTags")) {
                 parsedOptions.errorTags.addAll(asList(copyOfRange(option, 1, option.length)));;
+            } else if (option[0].equals("-typesToTreatAsOpaque")) {
+                parsedOptions.typesToTreatAsOpaque.addAll(asList(copyOfRange(option, 1, option.length)));;
             }
         }
         return parsedOptions;
@@ -91,6 +97,10 @@ public class DocletOptions {
     
     public List<String> getErrorTags() {
         return errorTags;
+    }
+
+    public List<String> getTypesToTreatAsOpaque() {
+        return typesToTreatAsOpaque;
     }
 
     public boolean isParseModels() {

@@ -1,6 +1,8 @@
 package com.hypnoticocelot.jaxrs.doclet.parser;
 
 import com.google.common.base.Predicate;
+
+import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
 import com.hypnoticocelot.jaxrs.doclet.model.Model;
 import com.hypnoticocelot.jaxrs.doclet.model.Property;
 import com.hypnoticocelot.jaxrs.doclet.translator.Translator;
@@ -12,11 +14,13 @@ import static com.google.common.collect.Collections2.filter;
 
 public class ApiModelParser {
 
+    private final DocletOptions options;
     private final Translator translator;
     private final Type rootType;
     private final Set<Model> models;
 
-    public ApiModelParser(Translator translator, Type rootType) {
+    public ApiModelParser(DocletOptions options, Translator translator, Type rootType) {
+        this.options = options;
         this.translator = translator;
         this.rootType = rootType;
         this.models = new LinkedHashSet<Model>();
@@ -31,8 +35,9 @@ public class ApiModelParser {
         boolean isPrimitive = /* type.isPrimitive()? || */ AnnotationHelper.isPrimitive(type);
         boolean isJavaxType = type.qualifiedTypeName().startsWith("javax.");
         boolean isBaseObject = type.qualifiedTypeName().equals("java.lang.Object");
+        boolean isTypeToTreatAsOpaque = options.getTypesToTreatAsOpaque().contains(type.qualifiedTypeName());
         ClassDoc classDoc = type.asClassDoc();
-        if (isPrimitive || isJavaxType || isBaseObject || classDoc == null || alreadyStoredType(type)) {
+        if (isPrimitive || isJavaxType || isBaseObject || isTypeToTreatAsOpaque || classDoc == null || alreadyStoredType(type)) {
             return;
         }
 
