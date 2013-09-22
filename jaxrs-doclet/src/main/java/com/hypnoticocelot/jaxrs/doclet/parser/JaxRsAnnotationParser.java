@@ -1,6 +1,7 @@
 package com.hypnoticocelot.jaxrs.doclet.parser;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
 import com.hypnoticocelot.jaxrs.doclet.Recorder;
 import com.hypnoticocelot.jaxrs.doclet.ServiceDoclet;
@@ -59,10 +60,13 @@ public class JaxRsAnnotationParser {
         Recorder recorder = options.getRecorder();
 
         for (ApiDeclaration api : apis) {
-            String resourceName = api.getResourcePath().replaceFirst("/", "").replaceAll("/", "_").replaceAll("[\\{\\}]", "");
-            resources.add(new ResourceListingAPI("/" + resourceName + ".{format}", ""));
-            File apiFile = new File(outputDirectory, resourceName + ".json");
-            recorder.record(apiFile, api);
+            String resourcePath = api.getResourcePath();
+            if (!Strings.isNullOrEmpty(resourcePath)) {
+                String resourceName = resourcePath.replaceFirst("/", "").replaceAll("/", "_").replaceAll("[\\{\\}]", "");
+                resources.add(new ResourceListingAPI("/" + resourceName + ".{format}", ""));
+                File apiFile = new File(outputDirectory, resourceName + ".json");
+                recorder.record(apiFile, api);
+            }
         }
 
         //write out json for api
