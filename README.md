@@ -37,7 +37,7 @@ To use the Swagger Doclet in your Maven project, add the following to your POM f
                             <docletArtifact>
                                 <groupId>com.hypnoticocelot</groupId>
                                 <artifactId>jaxrs-doclet</artifactId>
-                                <version>0.0.2</version>
+                                <version>0.0.3-SNAPSHOT</version>
                             </docletArtifact>
                             <reportOutputDirectory>${project.build.outputDirectory}</reportOutputDirectory>
                             <useStandardDocletOptions>false</useStandardDocletOptions>
