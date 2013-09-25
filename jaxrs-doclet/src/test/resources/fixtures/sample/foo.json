@@ -19,12 +19,12 @@
                             "dataType": "string"
                         }
                     ],
-                	"errorResponses": [
-                	    {
-                	        "code": 404,
-                	        "reason": "not found"
-                	    }
-                	]
+                    "errorResponses": [
+                        {
+                            "code": 404,
+                            "reason": "not found"
+                        }
+                    ]
                 },
                 {
                     "httpMethod": "POST",
