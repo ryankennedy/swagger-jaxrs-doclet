@@ -24,6 +24,8 @@ public class ApiMethodParser {
     private final String parentPath;
     private final MethodDoc methodDoc;
     private final Set<Model> models;
+    private final HttpMethod httpMethod;
+    private final String path;
 
     public ApiMethodParser(DocletOptions options, String parentPath, MethodDoc methodDoc) {
         this.options = options;
@@ -31,15 +33,14 @@ public class ApiMethodParser {
         this.parentPath = parentPath;
         this.methodDoc = methodDoc;
         this.models = new LinkedHashSet<Model>();
+        this.httpMethod = HttpMethod.fromMethod(methodDoc);
+        this.path = parentPath + firstNonNull(parsePath(methodDoc.annotations()), "");
     }
 
     public Method parse() {
-        HttpMethod httpMethod = HttpMethod.fromMethod(methodDoc);
         if (httpMethod == null) {
             return null;
         }
-
-        String path = parentPath + firstNonNull(parsePath(methodDoc.annotations()), "");
 
         // parameters
         List<ApiParameter> parameters = new LinkedList<ApiParameter>();
@@ -96,6 +97,20 @@ public class ApiMethodParser {
                 methodDoc.commentText().replace(firstSentences, ""),
                 returnType
         );
+    }
+
+    public boolean isSubResource() {
+        if (httpMethod == null) {
+            for (AnnotationDesc annotation : methodDoc.annotations())
+                if ("javax.ws.rs.Path".equals(annotation.annotationType().qualifiedTypeName())) {
+                    return true;
+                }
+        }
+        return false;
+    }
+
+    public String getPath() {
+        return path;
     }
 
     public Set<Model> models() {
