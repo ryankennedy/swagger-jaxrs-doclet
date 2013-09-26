@@ -23,6 +23,7 @@ public class ApiClassParser {
     private final String rootPath;
     private final Set<Model> models;
     private final Collection<ClassDoc> classes;
+    private final Method parentMethod;
 
     public ApiClassParser(DocletOptions options, ClassDoc classDoc, Collection<ClassDoc> classes) {
         this.options = options;
@@ -30,6 +31,20 @@ public class ApiClassParser {
         this.rootPath = firstNonNull(parsePath(classDoc.annotations()), "");
         this.models = new LinkedHashSet<Model>();
         this.classes = classes;
+        this.parentMethod = null;
+    }
+
+    /**
+     * Creates sub-resource class parser.
+     * @param parentMethod method that creates the sub-resource.
+     */
+    public ApiClassParser(DocletOptions options, ClassDoc classDoc, Collection<ClassDoc> classes, Method parentMethod) {
+        this.options = options;
+        this.classDoc = classDoc;
+        this.rootPath = firstNonNull(parsePath(classDoc.annotations()), "");
+        this.models = new LinkedHashSet<Model>();
+        this.classes = classes;
+        this.parentMethod = parentMethod;
     }
 
     public String getRootPath() {
@@ -41,28 +56,25 @@ public class ApiClassParser {
         Map<String, Collection<Method>> apiMethods = new HashMap<String, Collection<Method>>();
 
         for (MethodDoc method : classDoc.methods()) {
-            ApiMethodParser methodParser = new ApiMethodParser(options, rootPath, method);
+            ApiMethodParser methodParser = parentMethod == null ?
+                    new ApiMethodParser(options, rootPath, method) :
+                    new ApiMethodParser(options, parentMethod, method);
             Method parsedMethod = methodParser.parse();
             if (parsedMethod == null) {
-                if (methodParser.isSubResource()) {
-                    ClassDoc subResourceClassDoc = lookUpClassDoc(method.returnType());
-                    if (subResourceClassDoc != null) {
-                        String subResourcePath = firstNonNull(parsePath(subResourceClassDoc.annotations()), "");
-
-                        // delete class from the dictionary to handle recursive sub-resources
-                        Collection<ClassDoc> shrunkClasses = new ArrayList<ClassDoc>(classes);
-                        shrunkClasses.remove(classDoc);
-
-                        // recursively parser the sub-resource class
-                        ApiClassParser subResourceParser = new ApiClassParser(options, subResourceClassDoc, shrunkClasses);
-                        for (Api api : subResourceParser.parse()) {
-                            String subApiPath = methodParser.getPath() + api.getPath().substring(subResourcePath.length());
-                            apis.add(new Api(subApiPath, api.getDescription(), api.getOperations()));
-                        }
-                        models.addAll(subResourceParser.models());
-                    }
-                }
                 continue;
+            }
+            if (parsedMethod.isSubResource()) {
+                ClassDoc subResourceClassDoc = lookUpClassDoc(method.returnType());
+                if (subResourceClassDoc != null) {
+                    // delete class from the dictionary to handle recursive sub-resources
+                    Collection<ClassDoc> shrunkClasses = new ArrayList<ClassDoc>(classes);
+                    shrunkClasses.remove(classDoc);
+                    // recursively parse the sub-resource class
+                    ApiClassParser subResourceParser = new ApiClassParser(options, subResourceClassDoc, shrunkClasses, parsedMethod);
+                    apis.addAll(subResourceParser.parse());
+                    models.addAll(subResourceParser.models());
+                    continue;
+                }
             }
             models.addAll(methodParser.models());
 

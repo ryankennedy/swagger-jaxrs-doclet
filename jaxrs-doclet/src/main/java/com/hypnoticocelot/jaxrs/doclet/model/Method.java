@@ -65,6 +65,10 @@ public class Method {
         this.returnType = returnType;
     }
 
+    public boolean isSubResource() {
+        return method == null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

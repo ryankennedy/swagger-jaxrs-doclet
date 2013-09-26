@@ -4,7 +4,7 @@ import javax.ws.rs.*;
 
 public class SubResource {
     @GET
-    @Path("subAnnotated")
+    @Path("annotated")
     public String sayHello(@QueryParam("name") @DefaultValue("World") String name) {
         return "Hello, " + name + "!";
     }

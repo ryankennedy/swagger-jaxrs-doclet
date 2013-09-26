@@ -23,4 +23,9 @@ public class Service {
     public int createSpeechWithAnnotatedPayload(@Deprecated String speech) {
         return speech.hashCode();
     }
+
+    @Path("{fooId}/sub")
+    public SubResource getSubResource(@PathParam("fooId") String fooId) {
+        return new SubResource();
+    }
 }

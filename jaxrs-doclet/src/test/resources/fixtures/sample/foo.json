@@ -57,6 +57,48 @@
                     ]
                 }
             ]
+        },
+        {
+            "path": "/foo/{fooId}/sub",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "POST",
+                    "nickname": "createSub",
+                    "responseClass": "int",
+                    "parameters": [
+
+                        {
+                            "paramType": "path",
+                            "name": "fooId",
+                            "dataType": "string"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/foo/{fooId}/sub/annotated",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "nickname": "sayHello",
+                    "responseClass": "string",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "name",
+                            "dataType": "string"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "fooId",
+                            "dataType": "string"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }
