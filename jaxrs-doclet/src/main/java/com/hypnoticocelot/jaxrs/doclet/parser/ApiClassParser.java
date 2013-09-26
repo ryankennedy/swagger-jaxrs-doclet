@@ -73,8 +73,8 @@ public class ApiClassParser {
                     ApiClassParser subResourceParser = new ApiClassParser(options, subResourceClassDoc, shrunkClasses, parsedMethod);
                     apis.addAll(subResourceParser.parse());
                     models.addAll(subResourceParser.models());
-                    continue;
                 }
+                continue;
             }
             models.addAll(methodParser.models());
 
