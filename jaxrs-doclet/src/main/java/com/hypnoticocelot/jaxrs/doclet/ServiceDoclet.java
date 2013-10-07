@@ -39,6 +39,7 @@ public class ServiceDoclet {
         options.put("-docBasePath", 2);
         options.put("-apiBasePath", 2);
         options.put("-apiVersion", 2);
+        options.put("-swaggerUiZipPath", 2);
         options.put("-excludeAnnotationClasses", 2);
         options.put("-disableModels", 1);
         options.put("-errorTags", 2);
