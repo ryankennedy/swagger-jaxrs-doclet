@@ -94,3 +94,11 @@ $ curl localhost:8080/apidocs/service.json
 }
 $
 ```
+
+## Override Swagger UI
+
+To override the swagger ui included with the doclet, create your own swagger-ui.zip file and add a swaggerUiZipPath to the additionalparam attribute in the pom file.
+
+```
+<additionalparam>-apiVersion 1 -docBasePath /apidocs -apiBasePath / -swaggerUiZipPath ../../../src/main/resources/swagger-ui.zip</additionalparam>
+```
