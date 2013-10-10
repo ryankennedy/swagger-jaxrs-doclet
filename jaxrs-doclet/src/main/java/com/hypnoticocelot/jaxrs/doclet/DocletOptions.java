@@ -14,10 +14,11 @@ import static java.util.Arrays.asList;
 import static java.util.Arrays.copyOfRange;
 
 public class DocletOptions {
-
+    public static final String DEFAULT_SWAGGER_UI_ZIP_PATH = "n/a";
     private File outputDirectory;
     private String docBasePath = "http://localhost:8080";
     private String apiBasePath = "http://localhost:8080";
+    private String swaggerUiZipPath = DEFAULT_SWAGGER_UI_ZIP_PATH;
     private String apiVersion = "0";
     private List<String> typesToTreatAsOpaque;
     private List<String> errorTags;
@@ -62,6 +63,8 @@ public class DocletOptions {
                 parsedOptions.apiBasePath = option[1];
             } else if (option[0].equals("-apiVersion")) {
                 parsedOptions.apiVersion = option[1];
+            } else if (option[0].equals("-swaggerUiZipPath")) {
+                parsedOptions.swaggerUiZipPath = option[1];
             } else if (option[0].equals("-excludeAnnotationClasses")) {
                 parsedOptions.excludeAnnotationClasses.addAll(asList(copyOfRange(option, 1, option.length)));
             } else if (option[0].equals("-disableModels")) {
@@ -89,6 +92,10 @@ public class DocletOptions {
 
     public String getApiVersion() {
         return apiVersion;
+    }
+
+    public String getSwaggerUiZipPath() {
+        return swaggerUiZipPath;
     }
 
     public List<String> getExcludeAnnotationClasses() {
