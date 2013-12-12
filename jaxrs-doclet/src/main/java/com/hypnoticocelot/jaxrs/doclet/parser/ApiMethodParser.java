@@ -1,11 +1,7 @@
 package com.hypnoticocelot.jaxrs.doclet.parser;
 
 import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
-import com.hypnoticocelot.jaxrs.doclet.model.ApiParameter;
-import com.hypnoticocelot.jaxrs.doclet.model.ApiResponseMessage;
-import com.hypnoticocelot.jaxrs.doclet.model.HttpMethod;
-import com.hypnoticocelot.jaxrs.doclet.model.Method;
-import com.hypnoticocelot.jaxrs.doclet.model.Model;
+import com.hypnoticocelot.jaxrs.doclet.model.*;
 import com.hypnoticocelot.jaxrs.doclet.translator.Translator;
 import com.sun.javadoc.*;
 
@@ -24,6 +20,8 @@ public class ApiMethodParser {
     private final String parentPath;
     private final MethodDoc methodDoc;
     private final Set<Model> models;
+    private final HttpMethod httpMethod;
+    private final Method parentMethod;
 
     public ApiMethodParser(DocletOptions options, String parentPath, MethodDoc methodDoc) {
         this.options = options;
@@ -31,15 +29,26 @@ public class ApiMethodParser {
         this.parentPath = parentPath;
         this.methodDoc = methodDoc;
         this.models = new LinkedHashSet<Model>();
+        this.httpMethod = HttpMethod.fromMethod(methodDoc);
+        this.parentMethod = null;
+    }
+
+    public ApiMethodParser(DocletOptions options, Method parentMethod, MethodDoc methodDoc) {
+        this.options = options;
+        this.translator = options.getTranslator();
+        this.methodDoc = methodDoc;
+        this.models = new LinkedHashSet<Model>();
+        this.httpMethod = HttpMethod.fromMethod(methodDoc);
+        this.parentPath = parentMethod.getPath();
+        this.parentMethod = parentMethod;
     }
 
     public Method parse() {
-        HttpMethod httpMethod = HttpMethod.fromMethod(methodDoc);
-        if (httpMethod == null) {
+        String methodPath = firstNonNull(parsePath(methodDoc.annotations()), "");
+        if (httpMethod == null && methodPath.isEmpty()) {
             return null;
         }
-
-        String path = parentPath + firstNonNull(parsePath(methodDoc.annotations()), "");
+        String path = parentPath + methodPath;
 
         // parameters
         List<ApiParameter> parameters = new LinkedList<ApiParameter>();
@@ -57,6 +66,10 @@ public class ApiMethodParser {
                     translator.typeName(parameter.type()).value()
             ));
         }
+
+        // parent method parameters are inherited
+        if (parentMethod != null)
+            parameters.addAll(parentMethod.getParameters());
 
         // response messages
         Pattern pattern = Pattern.compile("(\\d+) (.+)"); // matches "<code><space><text>"
