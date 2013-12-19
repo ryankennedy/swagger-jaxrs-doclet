@@ -86,6 +86,9 @@ public class ApiMethodParser {
 
         // return type
         Type type = methodDoc.returnType();
+    	if("com.sun.jersey.api.JResponse".equals(type.qualifiedTypeName())) {
+    		type = type.asParameterizedType().typeArguments()[0];
+    	}
         String returnType = translator.typeName(type).value();
         if (options.isParseModels()) {
             models.addAll(new ApiModelParser(options, translator, type).parse());
