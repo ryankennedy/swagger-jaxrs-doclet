@@ -1,6 +1,12 @@
 language: java
-jdk:
-  - oraclejdk7
-  - openjdk7
-  - openjdk6
+script: "mvn deploy --settings maven_deploy_settings.xml"
 
+jdk:
+- oraclejdk7
+- openjdk7
+- openjdk6
+
+env:
+  global:
+  - secure: V7lBX52BsJ1ubo03czRa7VHs93Kv2jq8IjA4qs3+S/9kyb7P4Js0TtDyMklH7u6kSnzFa2WxSHIQDfwAwPMCHEVM/8pKNkrjDgW9z4gPW51b0vm5FHouCjHu4sf1EFh5WIZtF7dunFFEzj1hilYWT2HrVawbqzH0mMKAflWwL3I=
+  - secure: QZEoJL5gdtZ58rUtvH8BsLE6EMCcgZZwGunC4aF0DhpMpPYGmSNxb7RWpV7YbPXAUghMgPDadueNcH7pYZzQHR65fyWwtWCZ94wfsrVUFfkogO8FOeBQS7z9ueMHIJI3wwHUsqpeM425oCgrvGMo1hdxme75GUQwx1ZdYCKvIM4=
