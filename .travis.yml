@@ -4,7 +4,6 @@ script: "mvn deploy --settings maven_deploy_settings.xml"
 jdk:
 - oraclejdk7
 - openjdk7
-- openjdk6
 
 env:
   global:
