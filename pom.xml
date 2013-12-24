@@ -5,7 +5,7 @@
     <groupId>com.hypnoticocelot</groupId>
     <artifactId>jaxrs-doclet-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
     <name>JAX-RS Doclet</name>
     <url>https://github.com/ryankennedy/swagger-jaxrs-doclet</url>
     <description>

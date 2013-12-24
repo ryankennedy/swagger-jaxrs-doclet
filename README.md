@@ -37,7 +37,7 @@ To use the Swagger Doclet in your Maven project, add the following to your POM f
                             <docletArtifact>
                                 <groupId>com.hypnoticocelot</groupId>
                                 <artifactId>jaxrs-doclet</artifactId>
-                                <version>0.0.3-SNAPSHOT</version>
+                                <version>0.0.4-SNAPSHOT</version>
                             </docletArtifact>
                             <reportOutputDirectory>${project.build.outputDirectory}</reportOutputDirectory>
                             <useStandardDocletOptions>false</useStandardDocletOptions>
@@ -61,7 +61,7 @@ An example project using Dropwizard is included in `jaxrs-doclet-sample-dropwiza
 ```
 $ cd jaxrs-doclet-sample-dropwizard
 $ mvn package
-$ java -jar target/jaxrs-doclet-sample-dropwizard-0.0.3-SNAPSHOT.jar server sample.yml
+$ java -jar target/jaxrs-doclet-sample-dropwizard-0.0.4-SNAPSHOT.jar server sample.yml
 ```
 
 The example server should be running on port 8080:
