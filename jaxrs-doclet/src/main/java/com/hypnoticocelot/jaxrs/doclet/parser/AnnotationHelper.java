@@ -14,6 +14,7 @@ public class AnnotationHelper {
     private static final String JAX_RS_ANNOTATION_PACKAGE = "javax.ws.rs";
     private static final String JAX_RS_PATH = "javax.ws.rs.Path";
     private static final String JAX_RS_PATH_PARAM = "javax.ws.rs.PathParam";
+    private static final String JAX_RS_HEADER_PARAM = "javax.ws.rs.HeaderParam";
     private static final String JAX_RS_QUERY_PARAM = "javax.ws.rs.QueryParam";
     private static final String JERSEY_MULTIPART_FORM_PARAM = "com.sun.jersey.multipart.FormDataParam";
     
@@ -81,6 +82,8 @@ public class AnnotationHelper {
         AnnotationParser p = new AnnotationParser(parameter);
         if (p.isAnnotatedBy(JAX_RS_PATH_PARAM)) {
             return "path";
+        } else if (p.isAnnotatedBy(JAX_RS_HEADER_PARAM)) {
+            return "header";
         } else if (p.isAnnotatedBy(JAX_RS_QUERY_PARAM)) {
             return "query";
         } else if(p.isAnnotatedBy(JERSEY_MULTIPART_FORM_PARAM)) {
@@ -98,6 +101,9 @@ public class AnnotationHelper {
         String name = p.getAnnotationValue(JAX_RS_PATH_PARAM, "value");
         if (name == null) {
             name = p.getAnnotationValue(JAX_RS_QUERY_PARAM, "value");
+        }
+        if (name == null) {
+            name = p.getAnnotationValue(JAX_RS_HEADER_PARAM, "value");
         }
         if (name == null) {
             name = parameter.name();
