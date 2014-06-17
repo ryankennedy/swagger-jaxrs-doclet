@@ -57,8 +57,8 @@ public class ApiClassParser {
 
         for (MethodDoc method : classDoc.methods()) {
             ApiMethodParser methodParser = parentMethod == null ?
-                    new ApiMethodParser(options, rootPath, method) :
-                    new ApiMethodParser(options, parentMethod, method);
+                    new ApiMethodParser(options, rootPath, classes, method) :
+                    new ApiMethodParser(options, parentMethod, classes, method);
             Method parsedMethod = methodParser.parse();
             if (parsedMethod == null) {
                 continue;

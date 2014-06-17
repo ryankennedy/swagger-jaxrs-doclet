@@ -44,5 +44,27 @@ public class ServiceDocletTest {
         final ApiDeclaration expectedDeclaration = loadFixture("/fixtures/sample/foo.json", ApiDeclaration.class);
         verify(recorderMock).record(any(File.class), eq(expectedDeclaration));
     }
+    
+    @Test
+    public void testStartWithReturnTypeOverriden() throws IOException {
+        // given
+        String[][] opts = {{"-returnTypesOverrideMapping", "src/test/resources/fixtures/sample/returnTypeMapping.properties"}};
+        options = DocletOptions.parse(opts);
+        options.setRecorder(recorderMock);
+        
+        final RootDoc rootDoc = RootDocLoader.fromPath("src/test/resources", "fixtures.sample");
+        
+        //when
+        boolean parsingResult = new JaxRsAnnotationParser(options, rootDoc).run();
+        
+        //then
+        assertThat("JavaDoc generation failed", parsingResult, equalTo(true));
+
+        final ResourceListing expectedListing = loadFixture("/fixtures/sample/service.json", ResourceListing.class);
+        verify(recorderMock).record(any(File.class), eq(expectedListing));
+
+        final ApiDeclaration expectedDeclaration = loadFixture("/fixtures/sample/foo_returnTypeOverriden.json", ApiDeclaration.class);
+        verify(recorderMock).record(any(File.class), eq(expectedDeclaration));
+    }
 
 }

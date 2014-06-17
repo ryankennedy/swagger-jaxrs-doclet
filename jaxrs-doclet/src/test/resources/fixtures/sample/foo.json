@@ -59,6 +59,26 @@
             ]
         },
         {
+            "path": "/foo/jaxrsresponse",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "nickname": "getSubResourceWrappedInResponse",
+                    "responseClass": "Response",
+                    "parameters" : [ {
+                        "paramType" : "query",
+                        "name" : "pameter1",
+                        "dataType" : "string"
+                      }, {
+                        "paramType" : "query",
+                        "name" : "pameter2",
+                        "dataType" : "string"
+                      } ]
+                }
+            ]
+        },
+        {
             "path": "/foo/{fooId}/sub",
             "description": "",
             "operations": [

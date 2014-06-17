@@ -1,6 +1,7 @@
 package fixtures.sample;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 
 @Path("/foo")
 public class Service {
@@ -27,5 +28,11 @@ public class Service {
     @Path("{fooId}/sub")
     public SubResource getSubResource(@PathParam("fooId") String fooId) {
         return new SubResource();
+    }
+    
+    @Path("/jaxrsresponse")
+    @GET
+    public Response getSubResourceWrappedInResponse(@QueryParam("pameter1") @DefaultValue("pameter1") String pameter1, @QueryParam("pameter2") String pameter2) {
+       return Response.ok(new SubResource()).build();
     }
 }
