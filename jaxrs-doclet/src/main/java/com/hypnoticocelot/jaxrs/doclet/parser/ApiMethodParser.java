@@ -86,6 +86,8 @@ public class ApiMethodParser {
 
         // return type
         Type type = methodDoc.returnType();
+        type = firstNonNull(ApiModelParser.getTypeArgument(type), type);
+
         String returnType = translator.typeName(type).value();
         if (options.isParseModels()) {
             models.addAll(new ApiModelParser(options, translator, type).parse());

@@ -1,7 +1,6 @@
 package com.hypnoticocelot.jaxrs.doclet.parser;
 
 import com.google.common.base.Predicate;
-
 import com.hypnoticocelot.jaxrs.doclet.DocletOptions;
 import com.hypnoticocelot.jaxrs.doclet.model.Model;
 import com.hypnoticocelot.jaxrs.doclet.model.Property;
@@ -55,6 +54,9 @@ public class ApiModelParser {
         FieldDoc[] fieldDocs = classDoc.fields();
         if (fieldDocs != null) {
             for (FieldDoc field : fieldDocs) {
+                if (field.isStatic())
+                    continue;
+
                 String name = translator.fieldName(field).value();
                 if (name != null && !elements.containsKey(name)) {
                     elements.put(name, field.type());
@@ -65,6 +67,9 @@ public class ApiModelParser {
         MethodDoc[] methodDocs = classDoc.methods();
         if (methodDocs != null) {
             for (MethodDoc method : methodDocs) {
+                if (method.isStatic())
+                    continue;
+
                 String name = translator.methodName(method).value();
                 if (name != null && !elements.containsKey(name)) {
                     elements.put(name, method.returnType());
@@ -81,7 +86,7 @@ public class ApiModelParser {
             Type type = entry.getValue();
             ClassDoc typeClassDoc = type.asClassDoc();
 
-            Type containerOf = parseParameterisedTypeOf(type);
+            Type containerOf = getTypeArgument(type);
             String containerTypeOf = containerOf == null ? null : translator.typeName(containerOf).value();
 
             String propertyName = translator.typeName(type).value();
@@ -99,14 +104,14 @@ public class ApiModelParser {
     private void parseNestedModels(Collection<Type> types) {
         for (Type type : types) {
             parseModel(type);
-            Type pt = parseParameterisedTypeOf(type);
+            Type pt = getTypeArgument(type);
             if (pt != null) {
                 parseModel(pt);
             }
         }
     }
 
-    private Type parseParameterisedTypeOf(Type type) {
+    public static Type getTypeArgument(Type type) {
         Type result = null;
         ParameterizedType pt = type.asParameterizedType();
         if (pt != null) {
