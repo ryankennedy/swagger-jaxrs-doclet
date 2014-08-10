@@ -15,6 +15,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static com.google.common.collect.Maps.uniqueIndex;
+import static com.hypnoticocelot.jaxrs.doclet.parser.ParserHelper.mergeDeclarations;
+
 import com.hypnoticocelot.jaxrs.doclet.ServiceDoclet;
 import java.io.FileInputStream;
 
@@ -46,7 +48,9 @@ public class JaxRsAnnotationParser {
                 });
                 // The idea (and need) for the declaration is that "/foo" and "/foo/annotated" are stored in separate
                 // Api classes but are part of the same resource.
-                declarations.add(new ApiDeclaration(options.getApiVersion(), options.getApiBasePath(), classParser.getRootPath(), apis, models));
+                mergeDeclarations(declarations,
+                        new ApiDeclaration(options.getApiVersion(), options.getApiBasePath(),
+                                classParser.getRootPath(), apis, models));
             }
             writeApis(declarations);
             return true;
