@@ -1,3 +1,5 @@
+**[Carma-Public/swagger-jaxrs-doclet](https://github.com/Carma-Public/swagger-jaxrs-doclet "Carma-Public/swagger-jaxrs-doclet") has been doing more recent development on a fork of this project. Please consider checking that fork out first.**
+
 # Swagger Doclet [![Build Status](https://travis-ci.org/ryankennedy/swagger-jaxrs-doclet.png)](https://travis-ci.org/ryankennedy/swagger-jaxrs-doclet)
 
 A JavaDoc Doclet that can be used to generate a Swagger resource listing suitable for feeding to
