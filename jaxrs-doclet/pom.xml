@@ -9,6 +9,7 @@
     </parent>
 
     <artifactId>jaxrs-doclet</artifactId>
+    <version>0.0.5-Acrolinx</version>
 
     <dependencies>
         <dependency>

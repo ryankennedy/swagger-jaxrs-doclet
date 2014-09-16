@@ -29,7 +29,6 @@ public class DocletOptions {
 
     public DocletOptions() {
         excludeAnnotationClasses = new ArrayList<String>();
-        excludeAnnotationClasses.add("javax.ws.rs.HeaderParam");
         excludeAnnotationClasses.add("javax.ws.rs.core.Context");
         errorTags = new ArrayList<String>();
         errorTags.add("errorResponse");   // swagger 1.1
