@@ -25,6 +25,8 @@ public class AnnotationHelper {
         add("long");
         add("float");
         add("double");
+        add("char");
+        add("short");
         add("string");
         add("Date");
     }};
