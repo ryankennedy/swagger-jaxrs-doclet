@@ -6,6 +6,8 @@ import java.util.List;
 
 public class Method {
     private HttpMethod method;
+    private List<String> consumes;
+    private List<String> produces;
     private String methodName;
     private List<ApiParameter> apiParameters;
     private List<ApiResponseMessage> responseMessages;
@@ -18,8 +20,10 @@ public class Method {
     private Method() {
     }
 
-    public Method(HttpMethod method, String methodName, String path, List<ApiParameter> apiParameters, List<ApiResponseMessage> responseMessages, String firstSentence, String comment, String returnType) {
+    public Method(HttpMethod method, List<String> consumes, List<String> produces, String methodName, String path, List<ApiParameter> apiParameters, List<ApiResponseMessage> responseMessages, String firstSentence, String comment, String returnType) {
         this.method = method;
+        this.consumes = consumes;
+        this.produces = produces;
         this.methodName = methodName;
         this.path = path;
         this.apiParameters = apiParameters;
@@ -32,6 +36,10 @@ public class Method {
     public HttpMethod getMethod() {
         return method;
     }
+
+    public List<String> getConsumes() { return consumes; }
+
+    public List<String> getProduces() { return produces; }
 
     public String getMethodName() {
         return methodName;
@@ -75,6 +83,8 @@ public class Method {
         if (o == null || getClass() != o.getClass()) return false;
         Method that = (Method) o;
         return Objects.equal(method, that.method)
+                && Objects.equal(consumes, that.consumes)
+                && Objects.equal(produces, that.produces)
                 && Objects.equal(methodName, that.methodName)
                 && Objects.equal(apiParameters, that.apiParameters)
                 && Objects.equal(responseMessages, that.responseMessages)
@@ -86,13 +96,15 @@ public class Method {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(method, methodName, apiParameters, responseMessages, firstSentence, comment, returnType, path);
+        return Objects.hashCode(method, consumes, produces, methodName, apiParameters, responseMessages, firstSentence, comment, returnType, path);
     }
 
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
                 .add("method", method)
+                .add("consumes", consumes)
+                .add("produces", produces)
                 .add("methodName", methodName)
                 .add("apiParameters", apiParameters)
                 .add("responseMessages", responseMessages)

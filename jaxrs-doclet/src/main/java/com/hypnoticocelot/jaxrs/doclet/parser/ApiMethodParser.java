@@ -15,6 +15,8 @@ import static com.hypnoticocelot.jaxrs.doclet.parser.AnnotationHelper.parsePath;
 
 public class ApiMethodParser {
 
+    public static final String JAX_RS_CONSUMES = "javax.ws.rs.Consumes";
+    public static final String JAX_RS_PRODUCES = "javax.ws.rs.Produces";
     private final DocletOptions options;
     private final Translator translator;
     private final String parentPath;
@@ -49,6 +51,27 @@ public class ApiMethodParser {
             return null;
         }
         String path = parentPath + methodPath;
+
+        List<String> consumes = new ArrayList<>();
+        List<String> produces = new ArrayList<>();
+        for (AnnotationDesc annotation : methodDoc.annotations()) {
+            if (annotation.annotationType().qualifiedTypeName().equals(JAX_RS_CONSUMES)) {
+                for (AnnotationDesc.ElementValuePair pair : annotation.elementValues()){
+                    AnnotationValue[] values = (AnnotationValue[]) pair.value().value();
+                    for (AnnotationValue value : values) {
+                        consumes.add(value.value().toString());
+                    }
+                }
+            }
+            if (annotation.annotationType().qualifiedTypeName().equals(JAX_RS_PRODUCES)) {
+                for (AnnotationDesc.ElementValuePair pair : annotation.elementValues()) {
+                    AnnotationValue[] values = (AnnotationValue[]) pair.value().value();
+                    for (AnnotationValue value : values) {
+                        produces.add(value.value().toString());
+                    }
+                }
+            }
+        }
 
         // parameters
         List<ApiParameter> parameters = new LinkedList<ApiParameter>();
@@ -101,6 +124,8 @@ public class ApiMethodParser {
 
         return new Method(
                 httpMethod,
+                consumes,
+                produces,
                 methodDoc.name(),
                 path,
                 parameters,

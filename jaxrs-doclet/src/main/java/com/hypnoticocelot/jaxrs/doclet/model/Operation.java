@@ -11,6 +11,8 @@ import static com.google.common.base.Strings.emptyToNull;
 public class Operation {
 
     private HttpMethod httpMethod;
+    private List<String> consumes;
+    private List<String> produces;
     private String nickname;
     private String responseClass; // void, primitive, complex or a container
     private List<ApiParameter> parameters;
@@ -26,6 +28,8 @@ public class Operation {
 
     public Operation(Method method) {
         this.httpMethod = method.getMethod();
+        this.consumes = method.getConsumes();
+        this.produces = method.getProduces();
         this.nickname = emptyToNull(method.getMethodName());
         this.responseClass = emptyToNull(AnnotationHelper.typeOf(method.getReturnType()));
         this.parameters = method.getParameters().isEmpty() ? null : method.getParameters();
@@ -37,6 +41,10 @@ public class Operation {
     public HttpMethod getHttpMethod() {
         return httpMethod;
     }
+
+    public List<String> getConsumes() { return consumes; }
+
+    public List<String> getProduces() { return produces; }
 
     public String getNickname() {
         return nickname;
@@ -68,6 +76,8 @@ public class Operation {
         if (o == null || getClass() != o.getClass()) return false;
         Operation that = (Operation) o;
         return Objects.equal(httpMethod, that.httpMethod)
+                && Objects.equal(consumes, that.consumes)
+                && Objects.equal(produces, that.produces)
                 && Objects.equal(nickname, that.nickname)
                 && Objects.equal(responseClass, that.responseClass)
                 && Objects.equal(parameters, that.parameters)
@@ -78,13 +88,15 @@ public class Operation {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(httpMethod, nickname, responseClass, parameters, responseMessages, summary, notes);
+        return Objects.hashCode(httpMethod, consumes, produces, nickname, responseClass, parameters, responseMessages, summary, notes);
     }
 
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
                 .add("httpMethod", httpMethod)
+                .add("consumes", consumes)
+                .add("produces", produces)
                 .add("nickname", nickname)
                 .add("responseClass", responseClass)
                 .add("parameters", parameters)
