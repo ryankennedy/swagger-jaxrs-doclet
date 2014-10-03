@@ -1,17 +1,21 @@
 package com.hypnoticocelot.jaxrs.doclet;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.copyOfRange;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import com.hypnoticocelot.jaxrs.doclet.translator.AnnotationAwareTranslator;
 import com.hypnoticocelot.jaxrs.doclet.translator.FirstNotNullTranslator;
 import com.hypnoticocelot.jaxrs.doclet.translator.NameBasedTranslator;
 import com.hypnoticocelot.jaxrs.doclet.translator.Translator;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.copyOfRange;
 
 public class DocletOptions {
     public static final String DEFAULT_SWAGGER_UI_ZIP_PATH = "n/a";
@@ -26,6 +30,15 @@ public class DocletOptions {
     private boolean parseModels = true;
     private Recorder recorder = new ObjectMapperRecorder();
     private Translator translator;
+    /**
+     * mapping between a fully qualified method name and a type that should be used for documenting the model
+     * e.g.: 
+     * <pre>
+     * fixtures.sample.Service.getSubResourceWrappedInResponse(java.lang.String,java.lang.String)=fixtures.sample.SubResource
+     * </pre>
+     */
+    private Properties returnTypesOverrideMapping = new Properties();
+
 
     public DocletOptions() {
         excludeAnnotationClasses = new ArrayList<String>();
@@ -73,9 +86,45 @@ public class DocletOptions {
                 parsedOptions.errorTags.addAll(asList(copyOfRange(option, 1, option.length)));;
             } else if (option[0].equals("-typesToTreatAsOpaque")) {
                 parsedOptions.typesToTreatAsOpaque.addAll(asList(copyOfRange(option, 1, option.length)));;
+            } else if (option[0].equals("-returnTypesOverrideMapping")) {
+                checkArgument(option.length > 1, "Path to properties file with return types override mapping not provided!");
+                parsedOptions.returnTypesOverrideMapping = loadTypesOverrideMapping(option[1]);
             }
         }
         return parsedOptions;
+    }
+    
+    /**
+     * Loads a property file pointed by <code>filePath</code> that contains a mapping between a fully qualified method 
+     * and the return type that should be used for documenting the model
+     * 
+     * @param filePath
+     * @return
+     */
+    private static Properties loadTypesOverrideMapping(String filePath) {
+        Properties result = new Properties();
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(filePath); 
+            result.load(in);
+        } catch (FileNotFoundException e) {
+            checkArgument(false, "Properties file with return types override mapping not found!");
+        } catch (IOException e) {
+            checkArgument(false, "Error reading properties file with return types override mapping!");
+        } catch(IllegalArgumentException e) {
+            checkArgument(false, "Illegal characters in properties file with return types override mapping!");
+        }
+        finally {
+            if(in != null) {
+                try {
+                    in.close();
+                } catch (IOException ignore) {
+                    {}
+                }
+            }
+        }
+        
+        return result;
     }
 
     public File getOutputDirectory() {
@@ -130,6 +179,10 @@ public class DocletOptions {
     public DocletOptions setTranslator(Translator translator) {
         this.translator = translator;
         return this;
+    }
+    
+    public Properties getReturnTypesOverrideMapping() {
+        return returnTypesOverrideMapping;
     }
 
 }

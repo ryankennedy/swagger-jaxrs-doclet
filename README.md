@@ -104,3 +104,24 @@ To override the swagger ui included with the doclet, create your own swagger-ui.
 ```
 <additionalparam>-apiVersion 1 -docBasePath /apidocs -apiBasePath / -swaggerUiZipPath ../../../src/main/resources/swagger-ui.zip</additionalparam>
 ```
+
+## Override Model type returned by the REST method
+
+If the REST method returns e.g. `javax.ws.rs.core.Response` wrapping the real response type and the model is not generated, it is possible to override the type that should be used for model generation in a dedicated conf file. 
+It's a standard java properties file with mappings:
+
+    qualified method name=java type that should be used for model generation
+
+e.g.
+
+    fixtures.sample.Service.getSubResourceWrappedInResponse(java.lang.String,java.util.List<fixtures.sample.model.SomeClass>)=fixtures.sample.SubResource
+    fixtures.sample.Service.otherMethod()=fixtures.sample.SomeOtherClass
+
+Please notice there are NO white characters.
+The classes used for overriding MUST belong to the sources processed by this tool.
+
+To activate this feature, `-returnTypesOverrideMapping` doclet option has to be used:
+
+```
+<additionalparam>-apiVersion 1 -docBasePath /apidocs -apiBasePath / -returnTypesOverrideMapping PATH_TO_CONF_FILE/CONF_FILE.properties</additionalparam>
+```

@@ -1,0 +1,124 @@
+{
+    "apiVersion": "0",
+    "swaggerVersion": "1.1",
+    "basePath": "http://localhost:8080",
+    "resourcePath": "/foo",
+    "apis": [
+        {
+            "path": "/foo",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "nickname": "sayHello",
+                    "responseClass": "string",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "name",
+                            "dataType": "string"
+                        }
+                    ],
+                    "errorResponses": [
+                        {
+                            "code": 404,
+                            "reason": "not found"
+                        }
+                    ]
+                },
+                {
+                    "httpMethod": "POST",
+                    "nickname": "createSpeech",
+                    "responseClass": "int",
+                    "parameters": [
+                        {
+                            "paramType": "body",
+                            "name": "speech",
+                            "dataType": "string"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/foo/annotated",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "POST",
+                    "nickname": "createSpeechWithAnnotatedPayload",
+                    "responseClass": "int",
+                    "parameters": [
+                        {
+                            "paramType": "body",
+                            "name": "speech",
+                            "dataType": "string"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/foo/jaxrsresponse",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "nickname": "getSubResourceWrappedInResponse",
+                    "responseClass": "SubResource",
+                    "parameters" : [ {
+                        "paramType" : "query",
+                        "name" : "pameter1",
+                        "dataType" : "string"
+                      }, {
+                        "paramType" : "query",
+                        "name" : "pameter2",
+                        "dataType" : "string"
+                      } ]
+                }
+            ]
+        },
+        {
+            "path": "/foo/{fooId}/sub",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "POST",
+                    "nickname": "createSub",
+                    "responseClass": "int",
+                    "parameters": [
+
+                        {
+                            "paramType": "path",
+                            "name": "fooId",
+                            "dataType": "string"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/foo/{fooId}/sub/annotated",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "nickname": "sayHello",
+                    "responseClass": "string",
+                    "parameters": [
+                        {
+                            "paramType": "query",
+                            "name": "name",
+                            "dataType": "string"
+                        },
+                        {
+                            "paramType": "path",
+                            "name": "fooId",
+                            "dataType": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

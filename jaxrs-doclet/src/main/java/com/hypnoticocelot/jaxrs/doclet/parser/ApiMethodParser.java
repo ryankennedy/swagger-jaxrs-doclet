@@ -22,18 +22,23 @@ public class ApiMethodParser {
     private final Set<Model> models;
     private final HttpMethod httpMethod;
     private final Method parentMethod;
+    /**
+     * all the classes parsed by the doclet (used for method return type overriding)
+     */
+    private final Collection<ClassDoc> classes;
 
-    public ApiMethodParser(DocletOptions options, String parentPath, MethodDoc methodDoc) {
-        this.options = options;
+    public ApiMethodParser(DocletOptions options, String parentPath, Collection<ClassDoc> classes, MethodDoc methodDoc) {
+        this.options = options;    
         this.translator = options.getTranslator();
         this.parentPath = parentPath;
         this.methodDoc = methodDoc;
         this.models = new LinkedHashSet<Model>();
         this.httpMethod = HttpMethod.fromMethod(methodDoc);
         this.parentMethod = null;
+        this.classes = classes;
     }
 
-    public ApiMethodParser(DocletOptions options, Method parentMethod, MethodDoc methodDoc) {
+    public ApiMethodParser(DocletOptions options, Method parentMethod, Collection<ClassDoc> classes, MethodDoc methodDoc) {
         this.options = options;
         this.translator = options.getTranslator();
         this.methodDoc = methodDoc;
@@ -41,6 +46,7 @@ public class ApiMethodParser {
         this.httpMethod = HttpMethod.fromMethod(methodDoc);
         this.parentPath = parentMethod.getPath();
         this.parentMethod = parentMethod;
+        this.classes = classes;
     }
 
     public Method parse() {
@@ -85,7 +91,7 @@ public class ApiMethodParser {
         }
 
         // return type
-        Type type = methodDoc.returnType();
+        Type type = discoverReturnType();
         String returnType = translator.typeName(type).value();
         if (options.isParseModels()) {
             models.addAll(new ApiModelParser(options, translator, type).parse());
@@ -138,5 +144,33 @@ public class ApiMethodParser {
         }
         return "";
     }
-
+    
+    /**
+     * @return {@link Type} that should be used to document a model returned by the method. 
+     * If override return type doclet option is used (see {@link com.hypnoticocelot.jaxrs.doclet.ServiceDoclet#optionLength(String)} for options) and the overriding type 
+     * can be found in {@link DocletOptions#getReturnTypesOverrideMapping()} this type will be used; otherwise a type declared in the source code is used.
+     */
+    private Type discoverReturnType()  {
+        String key = methodDoc.toString().replaceAll("\\s", "");
+        if(options.getReturnTypesOverrideMapping().containsKey(key)) {
+            ClassDoc foundModel = findModel(options.getReturnTypesOverrideMapping().getProperty(key));
+            if(foundModel != null) return foundModel; 
+        }
+        return methodDoc.returnType();
+    }
+    
+    /**
+     * @param qualifiedClassName
+     * @return {@link ClassDoc} found among all classes processed by the doclet based on a given <code>qualifiedClassName</code>; 
+     * <code>null</code> if not found
+     * 
+     */
+    private ClassDoc findModel(String qualifiedClassName)  {
+        for (ClassDoc cls : classes) {
+            if(qualifiedClassName.equals(cls.qualifiedName())) {
+                return cls;
+            }
+        }
+        return null;
+    }
 }
