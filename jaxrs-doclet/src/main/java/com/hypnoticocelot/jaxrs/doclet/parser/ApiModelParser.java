@@ -32,6 +32,10 @@ public class ApiModelParser {
     }
 
     private void parseModel(Type type) {
+    	if("com.sun.jersey.api.JResponse".equals(type.qualifiedTypeName())) {
+    		type = type.asParameterizedType().typeArguments()[0];
+    	}
+
         boolean isPrimitive = /* type.isPrimitive()? || */ AnnotationHelper.isPrimitive(type);
         boolean isJavaxType = type.qualifiedTypeName().startsWith("javax.");
         boolean isBaseObject = type.qualifiedTypeName().equals("java.lang.Object");
@@ -40,7 +44,7 @@ public class ApiModelParser {
         if (isPrimitive || isJavaxType || isBaseObject || isTypeToTreatAsOpaque || classDoc == null || alreadyStoredType(type)) {
             return;
         }
-
+        
         Map<String, Type> types = findReferencedTypes(classDoc);
         Map<String, Property> elements = findReferencedElements(types);
         if (!elements.isEmpty()) {
@@ -50,26 +54,38 @@ public class ApiModelParser {
     }
 
     private Map<String, Type> findReferencedTypes(ClassDoc classDoc) {
+    	AnnotationParser p = new AnnotationParser(classDoc);
+    	String xmlAccessorType = p.getAnnotationValue("javax.xml.bind.annotation.XmlAccessorType", "value");
         Map<String, Type> elements = new HashMap<String, Type>();
 
-        FieldDoc[] fieldDocs = classDoc.fields();
-        if (fieldDocs != null) {
-            for (FieldDoc field : fieldDocs) {
-                String name = translator.fieldName(field).value();
-                if (name != null && !elements.containsKey(name)) {
-                    elements.put(name, field.type());
-                }
-            }
+        if (!"javax.xml.bind.annotation.XmlAccessType.PROPERTY".equals(xmlAccessorType)) {
+	        FieldDoc[] fieldDocs = classDoc.fields();
+	        if (fieldDocs != null) {
+	            for (FieldDoc field : fieldDocs) {
+	            	if (field.isStatic() || field.name().charAt(0) == '_') {
+	            		continue;
+	            	}
+	                String name = translator.fieldName(field).value();
+	                if (name != null && !elements.containsKey(name)) {
+	                    elements.put(name, field.type());
+	                }
+	            }
+	        }
         }
 
-        MethodDoc[] methodDocs = classDoc.methods();
-        if (methodDocs != null) {
-            for (MethodDoc method : methodDocs) {
-                String name = translator.methodName(method).value();
-                if (name != null && !elements.containsKey(name)) {
-                    elements.put(name, method.returnType());
-                }
-            }
+        if(!"javax.xml.bind.annotation.XmlAccessType.FIELD".equals(xmlAccessorType)) {
+	        MethodDoc[] methodDocs = classDoc.methods();
+	        if (methodDocs != null) {
+	            for (MethodDoc method : methodDocs) {
+	            	if (method.isStatic() || method.name().charAt(0) == '_') {
+	            		continue;
+	            	}
+	                String name = translator.methodName(method).value();
+	                if (name != null && !elements.containsKey(name)) {
+	                    elements.put(name, method.returnType());
+	                }
+	            }
+	        }
         }
         return elements;
     }
@@ -112,7 +128,7 @@ public class ApiModelParser {
         if (pt != null) {
             Type[] typeArgs = pt.typeArguments();
             if (typeArgs != null && typeArgs.length > 0) {
-                result = typeArgs[0];
+                result = typeArgs[typeArgs.length > 1 ? 1 : 0];
             }
         }
         return result;
