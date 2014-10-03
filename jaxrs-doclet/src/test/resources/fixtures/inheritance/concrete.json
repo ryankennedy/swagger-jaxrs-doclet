@@ -1,0 +1,37 @@
+{
+    "apiVersion": "0",
+    "swaggerVersion": "1.1",
+    "basePath": "http://localhost:8080",
+    "resourcePath": "/foo",
+    "apis": [
+        {
+            "path": "/foo/bar",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "nickname": "bar",
+                    "responseClass": "string"
+                }
+            ]
+        },
+        {
+            "path": "/foo/{id}",
+            "description": "",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "nickname": "getById",
+                    "responseClass": "string",
+                    "parameters": [
+                        {
+                            "paramType": "path",
+                            "name": "id",
+                            "dataType": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
