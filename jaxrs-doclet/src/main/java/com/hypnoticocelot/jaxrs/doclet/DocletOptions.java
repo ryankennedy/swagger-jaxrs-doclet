@@ -24,6 +24,7 @@ public class DocletOptions {
     private List<String> errorTags;
     private List<String> excludeAnnotationClasses;
     private boolean parseModels = true;
+    private boolean copyUiFiles = true;
     private Recorder recorder = new ObjectMapperRecorder();
     private Translator translator;
 
@@ -69,6 +70,8 @@ public class DocletOptions {
                 parsedOptions.excludeAnnotationClasses.addAll(asList(copyOfRange(option, 1, option.length)));
             } else if (option[0].equals("-disableModels")) {
                 parsedOptions.parseModels = false;
+            } else if (option[0].equals("-skipUiFiles")) {
+                parsedOptions.copyUiFiles = false;
             } else if (option[0].equals("-errorTags")) {
                 parsedOptions.errorTags.addAll(asList(copyOfRange(option, 1, option.length)));;
             } else if (option[0].equals("-typesToTreatAsOpaque")) {
@@ -112,6 +115,10 @@ public class DocletOptions {
 
     public boolean isParseModels() {
         return parseModels;
+    }
+
+    public boolean shouldCopyUiFiles() {
+        return copyUiFiles;
     }
 
     public Recorder getRecorder() {

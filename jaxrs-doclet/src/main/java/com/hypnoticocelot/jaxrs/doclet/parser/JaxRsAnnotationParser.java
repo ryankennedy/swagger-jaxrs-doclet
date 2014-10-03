@@ -75,7 +75,12 @@ public class JaxRsAnnotationParser {
         File docFile = new File(outputDirectory, "service.json");
         recorder.record(docFile, listing);
 
-        // Copy swagger-ui into the output directory.
+        if (options.shouldCopyUiFiles()) {
+            copyUiFiles(outputDirectory, swaggerUiZipPath, recorder);
+        }
+    }
+
+    private void copyUiFiles(File outputDirectory, String swaggerUiZipPath, Recorder recorder) throws IOException {
         ZipInputStream swaggerZip;
         if (DocletOptions.DEFAULT_SWAGGER_UI_ZIP_PATH.equals(swaggerUiZipPath)) {
             swaggerZip = new ZipInputStream(ServiceDoclet.class.getResourceAsStream("/swagger-ui.zip"));
@@ -92,7 +97,7 @@ public class JaxRsAnnotationParser {
                 throw new RuntimeException("-swaggerUiZipPath not set correct, file not found: " + swaggerUiZipPath);
             }
         }
-        
+
         ZipEntry entry = swaggerZip.getNextEntry();
         while (entry != null) {
             final File swaggerFile = new File(outputDirectory, entry.getName());
