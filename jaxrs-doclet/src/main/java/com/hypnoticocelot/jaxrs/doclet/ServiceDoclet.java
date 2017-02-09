@@ -43,6 +43,7 @@ public class ServiceDoclet {
         options.put("-excludeAnnotationClasses", 2);
         options.put("-disableModels", 1);
         options.put("-errorTags", 2);
+        options.put("-typesToTreatAsOpaque", 2);
 
         Integer value = options.get(option);
         if (value != null) {
